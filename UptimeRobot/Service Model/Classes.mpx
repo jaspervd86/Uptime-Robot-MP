@@ -1,0 +1,69 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><TypeDefinitions>
+    <EntityTypes>
+      <ClassTypes>
+        <ClassType ID="UptimeRobot.WatcherNode" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.ComputerRole" Hosted="true" Singleton="false" Extension="false">
+          <Property ID="APIkey" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+        </ClassType>
+        <ClassType ID="UptimeRobot.WebCheck" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
+          <Property ID="ID" Type="int" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="FriendlyName" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="URL" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="Interval" Type="int" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="KeywordValue" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="KeywordType" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="HTTPUserName" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="Port" Type="int" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="Type" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+        </ClassType>
+      </ClassTypes>
+      <RelationshipTypes>
+        <RelationshipType ID="UptimeRobotNodeHostsChecks" Accessibility="Public" Abstract="false" Base="System!System.Hosting">
+          <Source ID="src" MinCardinality="0" MaxCardinality="2147483647" Type="UptimeRobot.WatcherNode" />
+          <Target ID="trgt" MinCardinality="0" MaxCardinality="2147483647" Type="UptimeRobot.WebCheck" />
+        </RelationshipType>
+      </RelationshipTypes>
+    </EntityTypes>
+  </TypeDefinitions><LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="UptimeRobot.WatcherNode">
+          <Name>Uptime Robot Watcher Node</Name>
+          <Description></Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck">
+          <Name>Uptime Robot Web Check</Name>
+          <Description></Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WatcherNode" SubElementID="APIkey">
+          <Name>API Key</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck" SubElementID="ID">
+          <Name>ID</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck" SubElementID="FriendlyName">
+          <Name>Friendly Name</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck" SubElementID="URL">
+          <Name>URL</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck" SubElementID="Interval">
+          <Name>Interval of the Check</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck" SubElementID="KeywordValue">
+          <Name>Keyword Value</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck" SubElementID="KeywordType">
+          <Name>Keyword Type</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck" SubElementID="HTTPUserName">
+          <Name>HTTP User Name</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck" SubElementID="Port">
+          <Name>Port</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck" SubElementID="Type">
+          <Name>Type</Name>
+        </DisplayString>
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks></ManagementPackFragment>

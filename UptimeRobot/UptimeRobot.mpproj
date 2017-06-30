@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <ProjectGuid>{6539089e-a06a-468d-8585-92c4be923978}</ProjectGuid>
+    <RootNamespace>UptimeRobot.ManagementPack</RootNamespace>
+    <Name>UptimeRobot.ManagementPack</Name>
+    <ManagementPackName>UptimeRobot.ManagementPack</ManagementPackName>
+    <Version>1.0.0.0</Version>
+    <MpFrameworkVersion>v7.0.2</MpFrameworkVersion>
+    <MpFrameworkProfile>OM</MpFrameworkProfile>
+    <ProductVersion>1.1.0.0</ProductVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <GenerateSealed>False</GenerateSealed>
+    <Company>Realdolmen</Company>
+    <Copyright>Copyright (c) Realdolmen. All rights reserved.</Copyright>
+    <DelaySigning>False</DelaySigning>
+    <AssemblyOriginatorKeyFile>C:\TEMP\MPS\_SEAL\Key\RD.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>false</DebugSymbols>
+    <OutputPath>bin\Release\</OutputPath>
+    <DelaySigning>false</DelaySigning>
+    <Company>MyCompany</Company>
+    <Copyright>Copyright (c) MyCompany. All rights reserved.</Copyright>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile />
+  </PropertyGroup>
+  <ItemGroup>
+    <ManagementPackReference Include="Microsoft.SystemCenter.DataWarehouse.Library">
+      <HintPath>C:\Program Files (x86)\System Center Visual Studio Authoring Extensions\References\OM2012R2\Microsoft.SystemCenter.DataWarehouse.Library.mp</HintPath>
+      <Alias>MSDL</Alias>
+      <MinVersion>7.1.10226.0</MinVersion>
+      <PackageToBundle>False</PackageToBundle>
+    </ManagementPackReference>
+    <ManagementPackReference Include="Microsoft.SystemCenter.Library">
+      <Alias>SC</Alias>
+      <PackageToBundle>False</PackageToBundle>
+    </ManagementPackReference>
+    <ManagementPackReference Include="Microsoft.Windows.Library">
+      <Alias>Windows</Alias>
+      <PackageToBundle>false</PackageToBundle>
+    </ManagementPackReference>
+    <ManagementPackReference Include="System.AdminItem.Library">
+      <HintPath>\\i2v-scom-001\Software\SW_DVD5_Sys_Ctr_2012_R2_English_OpsMgr_MLF_X19-18307\ManagementPacks\System.AdminItem.Library.mp</HintPath>
+      <Alias>SAL</Alias>
+      <MinVersion>7.5.8501.0</MinVersion>
+      <PackageToBundle>False</PackageToBundle>
+    </ManagementPackReference>
+    <ManagementPackReference Include="System.Health.Library">
+      <Alias>Health</Alias>
+      <PackageToBundle>False</PackageToBundle>
+    </ManagementPackReference>
+    <ManagementPackReference Include="System.Library">
+      <Alias>System</Alias>
+      <PackageToBundle>False</PackageToBundle>
+    </ManagementPackReference>
+    <ManagementPackReference Include="Microsoft.SystemCenter.Visualization.Library">
+      <Alias>Visualization</Alias>
+      <PackageToBundle>false</PackageToBundle>
+    </ManagementPackReference>
+    <ManagementPackReference Include="System.Performance.Library">
+      <HintPath>C:\Program Files (x86)\System Center Visual Studio Authoring Extensions\References\OM2012R2\System.Performance.Library.mp</HintPath>
+      <Alias>Perf</Alias>
+      <MinVersion>7.0.8433.0</MinVersion>
+      <PackageToBundle>False</PackageToBundle>
+    </ManagementPackReference>
+    <ManagementPackReference Include="System.Software.Library">
+      <HintPath>\\i2v-scom-001\Software\SW_DVD5_Sys_Ctr_2012_R2_English_OpsMgr_MLF_X19-18307\ManagementPacks\System.Software.Library.mp</HintPath>
+      <Alias>SSL</Alias>
+      <MinVersion>7.5.8501.0</MinVersion>
+      <PackageToBundle>False</PackageToBundle>
+    </ManagementPackReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Health Model" />
+    <Folder Include="Health Model\Discoveries" />
+    <Folder Include="Health Model\Discoveries\Scripts" />
+    <Folder Include="Health Model\Monitors" />
+    <Folder Include="Health Model\Monitors\Scripts" />
+    <Folder Include="Health Model\Views" />
+    <Folder Include="Health Model\Rules\Scripts" />
+    <Folder Include="Health Model\Tasks" />
+    <Folder Include="Health Model\Rules" />
+    <Folder Include="Health Model\Tasks\Scripts" />
+    <Folder Include="Service Model" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Health Model\Discoveries\Scripts\GetMonitors.ps1" />
+    <EmbeddedResource Include="Health Model\Monitors\Scripts\GetMonitorsStatus.ps1" />
+    <EmbeddedResource Include="Health Model\Rules\Scripts\Get-WebsiteResponseTime.ps1" />
+    <EmbeddedResource Include="Health Model\Tasks\Scripts\Add-NewMonitor.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Health Model\Discoveries\Discoveries.mptg.mpx">
+      <SubType>Code</SubType>
+      <DependentUpon>Health Model\Discoveries\Discoveries.mptg</DependentUpon>
+    </Compile>
+    <Compile Include="Health Model\Monitors\MonitorTypes.mpx">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Health Model\Monitors\Monitors.mptg.mpx">
+      <SubType>Code</SubType>
+      <DependentUpon>Health Model\Monitors\Monitors.mptg</DependentUpon>
+    </Compile>
+    <Compile Include="Health Model\Rules\Rule.PS.Perf.ResponseTime.mpx">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Health Model\Tasks\Add-NewMonitor.mpx">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Health Model\Views\Folders.mpx">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Health Model\Views\Views.mptg.mpx">
+      <SubType>Code</SubType>
+      <DependentUpon>Health Model\Views\Views.mptg</DependentUpon>
+    </Compile>
+    <Compile Include="mp.mpx">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Service Model\Classes.mpx">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Service Model\SecureReference.mpx">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Health Model\Discoveries\Discoveries.mptg">
+      <SubType>Content</SubType>
+      <Generator>FragmentGenerator</Generator>
+    </Content>
+    <Content Include="Health Model\Monitors\Monitors.mptg">
+      <SubType>Content</SubType>
+      <Generator>FragmentGenerator</Generator>
+    </Content>
+    <Content Include="Health Model\Views\Views.mptg">
+      <SubType>Content</SubType>
+      <Generator>FragmentGenerator</Generator>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\VSAC\Microsoft.SystemCenter.OperationsManager.targets" />
+</Project>

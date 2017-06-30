@@ -1,0 +1,146 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <!--
+%%
+Description:
+  This fragment includes an AGENT TASK that will run a PowerShell Script
+  ClassID is the targeted class such as your custom class or Windows!Microsoft.Windows.Server.OperatingSystem
+  TaskName is a short name for the task with no spaces or special characters allowed
+  You will need to customize your parameters in this example and add or remove as needed
+Version: 1.0
+LastModified: 29-May-2017
+%%
+
+In this fragment you need to replace:
+  ##CompanyID##
+  UptimeRobot
+  UptimeRobot.WatcherNode
+  AddNewMonitor
+
+This fragment depends on references:
+  RequiredReference: Alias="System", ID="System.Library"
+  RequiredReference: Alias="Windows", ID="Microsoft.Windows.Library"
+-->
+  <TypeDefinitions>
+    <ModuleTypes>
+      <WriteActionModuleType ID="UptimeRobot.AddNewMonitor.Task.WA" Accessibility="Internal" Batching="false">
+        <Configuration>
+          <xsd:element minOccurs="1" name="newUrl" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element minOccurs="1" name="name" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element minOccurs="1" name="interval" type="xsd:int" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element minOccurs="1" name="APIKey" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element minOccurs="1" name="TimeoutSeconds" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="newURL" Selector="$Config/newUrl$" ParameterType="string" />
+          <OverrideableParameter ID="name" Selector="$Config/name$" ParameterType="string" />
+          <OverrideableParameter ID="interval" Selector="$Config/interval$" ParameterType="int" />
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <WriteAction ID="PSWA" TypeID="Windows!Microsoft.Windows.PowerShellWriteAction">
+                <ScriptName>UptimeRobot.AddNewMonitor.ps1</ScriptName>
+                <ScriptBody>
+                  param(
+    [Parameter(Mandatory=$true)]
+    [string]$newUrl,
+    [Parameter(Mandatory=$true)]
+    [string]$name,
+    [Parameter(Mandatory=$true)]
+    [int]$interval,
+	[Parameter(Mandatory=$true)]
+    [string]$APIKey
+)
+
+#Create Discovery Property Bag
+$api = new-object -comObject 'MOM.ScriptAPI'
+$api.LogScriptEvent("Add-NewMonitor.ps1", 8004, 0, "TASK started: Adding a new Uptime Robot monitor")
+
+$Header = @{
+    "Content-Type" = "application/x-www-form-urlencoded"
+    "Cache-Control" = "no-cache"
+    
+}
+
+$body = @{
+	"api_key" = $APIKey
+    "url" = $newUrl
+    "friendly_name" = $name
+    "type" = "1"
+    "interval" = $interval
+}
+
+$URL = 'https://api.uptimerobot.com/v2/newMonitor'
+
+$newMonitor = (Invoke-RestMethod -Method POST -uri $URL -Headers  $header -Body $body)
+if ($newMonitor.stat -ne "ok")
+    {
+        Write-Output "Failed to create monitor for $newUrl"
+    }
+
+else
+    {
+        Write-Output $newMonitor.monitor
+    }
+
+$api.LogScriptEvent("Add-NewMonitor.ps1", 8005, 0, "TASK executed: Adding a new Uptime Robot monitor")
+  
+                </ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>newUrl</Name>
+                    <Value>$Config/newUrl$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>name</Name>
+                    <Value>$Config/name$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>interval</Name>
+                    <Value>$Config/interval$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>APIKey</Name>
+                    <Value>$Config/APIKey$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              </WriteAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="PSWA" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.BaseData</OutputType>
+        <InputType>System!System.BaseData</InputType>
+      </WriteActionModuleType>
+    </ModuleTypes>
+  </TypeDefinitions>
+  <Monitoring>
+    <Tasks>
+      <Task ID="UptimeRobot.AddNewMonitor.Task" Accessibility="Public" Enabled="true" Target="UptimeRobot.WatcherNode" Timeout="120" Remotable="true">
+        <Category>Custom</Category>
+        <WriteAction ID="PSWA" TypeID="UptimeRobot.AddNewMonitor.Task.WA">
+          <newUrl>Http://newUrl</newUrl>
+          <name>My new URL</name>
+          <interval>300</interval>
+          <APIKey>$Target/Property[Type='UptimeRobot.WatcherNode']/APIkey$</APIKey>
+          <TimeoutSeconds>60</TimeoutSeconds>
+        </WriteAction>
+      </Task>
+    </Tasks>
+  </Monitoring>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="UptimeRobot.AddNewMonitor.Task">
+          <Name>Add new WebCheck monitor</Name>
+          <Description>Will add a new HTTP monitor to your Uptime Robot account</Description>
+        </DisplayString>
+      </DisplayStrings>
+      <KnowledgeArticles></KnowledgeArticles>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

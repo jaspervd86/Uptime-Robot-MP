@@ -1,0 +1,74 @@
+<TemplateGroup>
+  <Instances>
+    <Instance ID="Instance1cb8bbbf42bb4bd8ba0ce5a2d4aaa2da" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.UnitMonitor" Version="1.0.0.0">
+      <UnitMonitorConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <MonitorType>UptimeRobot.ManagementPack.Webcheck.Status.MonitorType</MonitorType>
+        <MonitorConfig>&lt;IntervalSeconds&gt;300&lt;/IntervalSeconds&gt;&lt;SyncTime&gt;12:00&lt;/SyncTime&gt;&lt;ID&gt;$Target/Property[Type='UptimeRobot.WebCheck']/ID$&lt;/ID&gt;&lt;APIkey&gt;$Target/Host/Property[Type='UptimeRobot.WatcherNode']/APIkey$&lt;/APIkey&gt;</MonitorConfig>
+        <MonitorOperationalStates>
+          <OperationalState>
+            <OperationalStateId>CDStatusOK</OperationalStateId>
+            <OperationalStateDisplayName>CDStatusOK</OperationalStateDisplayName>
+            <MonitorTypeStateId>CDStatusOK</MonitorTypeStateId>
+            <HealthState>Success</HealthState>
+          </OperationalState>
+          <OperationalState>
+            <OperationalStateId>CDStatusNOK</OperationalStateId>
+            <OperationalStateDisplayName>CDStatusNOK</OperationalStateDisplayName>
+            <MonitorTypeStateId>CDStatusNOK</MonitorTypeStateId>
+            <HealthState>Error</HealthState>
+          </OperationalState>
+        </MonitorOperationalStates>
+        <MonitorRunAs>UptimeRobot.ManagementPack.RunasProfile</MonitorRunAs>
+        <ParentMonitor>Health!System.Health.AvailabilityState</ParentMonitor>
+        <Accessibility>Internal</Accessibility>
+        <Id>Webcheck.Status.Monitor</Id>
+        <DisplayName>Webcheck Status Monitor</DisplayName>
+        <Description>Evaluate status of a specific webcheck</Description>
+        <Target>UptimeRobot.WebCheck</Target>
+        <Enabled>true</Enabled>
+        <Category>AvailabilityHealth</Category>
+        <Remotable>true</Remotable>
+        <Priority>Normal</Priority>
+        <AlertAutoResolve>true</AlertAutoResolve>
+        <AlertOnState>Error</AlertOnState>
+        <AlertPriority>Normal</AlertPriority>
+        <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+        <AlertName>Uptime Robot Webcheck Status Alert</AlertName>
+        <AlertDescription>An external facing website $Target/Property[Type='UptimeRobot.WebCheck']/FriendlyName$ is down, the status of the website is $Data/Context/Property[@Name='Status']$
+These are the possible states:
+0 - paused 
+1 - not checked yet 
+2 - up 
+8 - seems down 
+9 - down 
+</AlertDescription>
+        <ConfirmDelivery>false</ConfirmDelivery>
+      </UnitMonitorConfig>
+    </Instance>
+    <Instance ID="Instance575e4c17277a4b08978d7dbfad3d49d9" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.DependencyMonitor" Version="1.0.0.0">
+      <DependencyMonitorConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <Algorithm>
+          <Algorithm>WorstOf</Algorithm>
+        </Algorithm>
+        <MemberMonitor>Health!System.Health.AvailabilityState</MemberMonitor>
+        <MemberInMaintenance>Ignore</MemberInMaintenance>
+        <MemberUnavailable>Ignore</MemberUnavailable>
+        <RelationshipType>UptimeRobotNodeHostsChecks</RelationshipType>
+        <ParentMonitor>Health!System.Health.AvailabilityState</ParentMonitor>
+        <Accessibility>Internal</Accessibility>
+        <Id>Webchecks.Dependency.Monitor</Id>
+        <DisplayName>Uptime Robot Webchecks Dependency Monitor</DisplayName>
+        <Description>Dependency monitor for Uptime Robot webchecks</Description>
+        <Target>UptimeRobot.WatcherNode</Target>
+        <Enabled>true</Enabled>
+        <Category>AvailabilityHealth</Category>
+        <Remotable>true</Remotable>
+        <Priority>Normal</Priority>
+        <AlertAutoResolve>true</AlertAutoResolve>
+        <AlertOnState>None</AlertOnState>
+        <AlertPriority>Normal</AlertPriority>
+        <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+      </DependencyMonitorConfig>
+    </Instance>
+  </Instances>
+</TemplateGroup>

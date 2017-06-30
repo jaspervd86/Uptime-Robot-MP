@@ -1,0 +1,119 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!-- In this fragment you need to replace UptimeRobot,WebCheck, ResponseTimeScript,ResponseTime, ##$VariablefromBody##, UptimeRobot.WebCheck, ##ObjectName##, ##CounterName##, ##InstanceName## -->
+<!-- This fragment includes a RULE that uses a PowerShell script to collect data and output/map it to Performance data for collection -->
+<!-- This fragment depends on references:  
+	Windows!	=	Microsoft.Windows.Library
+	Perf!		=	System.Performance.Library
+	System!		=	System.Library
+	SC!			=	Microsoft.SystemCenter.Library
+	MSDL!		=	Microsoft.SystemCenter.DataWarehouse.Library
+--> 
+  <TypeDefinitions>
+    <ModuleTypes>
+      <DataSourceModuleType ID="UptimeRobot.WebCheck.ResponseTimeScript.DS" Accessibility="Internal" Batching="false">
+        <Configuration>
+          <xsd:element type="xsd:integer" name="TimeoutSeconds" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element type="xsd:integer" name="IntervalSeconds" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element type="xsd:string" name="apiKey" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" /> 
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <DataSource ID="Scheduler" TypeID="System!System.Scheduler">
+                <Scheduler>
+                  <SimpleReccuringSchedule>
+                    <Interval Unit="Seconds">$Config/IntervalSeconds$</Interval>
+                  </SimpleReccuringSchedule>
+                  <ExcludeDates />
+                </Scheduler>
+              </DataSource>
+              <ProbeAction ID="Probe" TypeID="UptimeRobot.WebCheck.ResponseTimeScript.PA">
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="Probe">
+                <Node ID="Scheduler" />
+              </Node>
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+      </DataSourceModuleType>
+      <ProbeActionModuleType ID="UptimeRobot.WebCheck.ResponseTimeScript.PA" Accessibility="Internal" Batching="false" PassThrough="false" RunAs="UptimeRobot.ManagementPack.RunasProfile">
+        <Configuration>
+          <xsd:element type="xsd:integer" name="TimeoutSeconds" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <ProbeAction ID="Probe" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
+                <ScriptName>Get-WebSiteResponseTime.ps1</ScriptName>
+                <ScriptBody>
+                  $IncludeFileContent/Health Model/Rules/Scripts/Get-WebSiteResponseTime.ps1$
+                </ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>apiKey</Name>
+                    <Value>$Target/Host/Property[Type='UptimeRobot.WatcherNode']/APIkey$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>ID</Name>
+                    <Value>$Target/Property[Type='UptimeRobot.WebCheck']/ID$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="Probe" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+        <TriggerOnly>true</TriggerOnly>
+      </ProbeActionModuleType>
+    </ModuleTypes>
+  </TypeDefinitions>
+  <Monitoring>
+    <Rules>
+      <Rule ID="UptimeRobot.WebCheck.ResponseTimeScript.Rule" Comment="Generic Comment" Enabled="true" Target="UptimeRobot.WebCheck" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+        <Category>PerformanceCollection</Category>
+        <DataSources>
+          <DataSource ID="DataSource" TypeID="UptimeRobot.WebCheck.ResponseTimeScript.DS">
+            <TimeoutSeconds>200</TimeoutSeconds>
+            <IntervalSeconds>300</IntervalSeconds>
+            <apiKey>$Target/Host/Property[Type='UptimeRobot.WatcherNode']/APIkey$</apiKey>
+          </DataSource>
+        </DataSources>
+        <ConditionDetection ID="System.Performance.DataGenericMapper" TypeID="Perf!System.Performance.DataGenericMapper">
+          <ObjectName>$Target/Host/Host/Property[Type='Windows!Microsoft.Windows.Computer']/PrincipalName$</ObjectName>
+          <CounterName>Response Time (ms)</CounterName>
+          <InstanceName>$Target/Property[Type='UptimeRobot.WebCheck']/FriendlyName$</InstanceName>
+          <Value>$Data/Property[@Name='ResponseTime']$</Value>
+        </ConditionDetection>
+        <WriteActions>
+          <WriteAction ID="Microsoft.SystemCenter.CollectPerformanceData" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+          <WriteAction ID="Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" TypeID="MSDL!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+        </WriteActions>
+      </Rule>
+    </Rules>
+  </Monitoring>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="UptimeRobot.WebCheck.ResponseTimeScript.Rule">
+          <Name>Uptime Robot Web Check Response time</Name>
+          <Description></Description>
+        </DisplayString>
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>  
+</ManagementPackFragment>
