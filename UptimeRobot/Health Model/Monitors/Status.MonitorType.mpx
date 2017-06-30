@@ -36,8 +36,6 @@
         <Configuration>
           <xsd:element minOccurs="0" name="ID" type="xsd:integer" />
           <xsd:element minOccurs="0" name="APIkey" type="xsd:string" />
-          <xsd:element minOccurs="0" name="Uptime" type="xsd:int" />
-          <xsd:element minOccurs="0" name="UptimeThreshold" type="xsd:int" />
         </Configuration>
         <ModuleImplementation Isolation="Any">
           <Composite>
@@ -53,14 +51,6 @@
                   <Parameter>
                     <Name>APIkey</Name>
                     <Value>$Target/Host/Property[Type='UptimeRobot.WatcherNode']/APIkey$</Value>
-                  </Parameter>
-                  <Parameter>
-                    <Name>UptimeThreshold</Name>
-                    <Value>$Config/UptimeThreshold$</Value>
-                  </Parameter>
-                  <Parameter>
-                    <Name>Uptime</Name>
-                    <Value>$Config/Uptime$</Value>
                   </Parameter>
                 </Parameters>
                 <TimeoutSeconds>300</TimeoutSeconds>

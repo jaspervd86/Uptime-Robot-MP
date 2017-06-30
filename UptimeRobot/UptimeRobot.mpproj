@@ -99,7 +99,10 @@
       <SubType>Code</SubType>
       <DependentUpon>Health Model\Discoveries\Discoveries.mptg</DependentUpon>
     </Compile>
-    <Compile Include="Health Model\Monitors\MonitorTypes.mpx">
+    <Compile Include="Health Model\Monitors\Response.MonitorType.mpx">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Health Model\Monitors\Status.MonitorType.mpx">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Health Model\Monitors\Monitors.mptg.mpx">

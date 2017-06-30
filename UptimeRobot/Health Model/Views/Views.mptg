@@ -15,15 +15,15 @@
       </CustomViewConfig>
     </Instance>
     <Instance ID="Instanced2af8eb4e70e4484a2c0f127a098c626" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.CustomView" Version="1.0.0.0">
-      <CustomViewConfig xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <CustomViewConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
         <ViewFolder>UptimeRobot.ManagementPack.Folders</ViewFolder>
         <ViewType>SC!Microsoft.SystemCenter.StateViewType</ViewType>
         <ViewConfiguration>&lt;Criteria /&gt;&lt;Presentation&gt;&lt;ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Ascending"&gt;&lt;Name&gt;State&lt;/Name&gt;&lt;Id&gt;UptimeRobot.WatcherNode&lt;/Id&gt;&lt;/ColumnInfo&gt;&lt;ColumnInfo Index="1" SortIndex="-1" Width="22" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending"&gt;&lt;Name&gt;Maintenance Mode&lt;/Name&gt;&lt;Id&gt;InMaintenanceMode&lt;/Id&gt;&lt;/ColumnInfo&gt;&lt;ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending"&gt;&lt;Name&gt;Name&lt;/Name&gt;&lt;Id&gt;Name&lt;/Id&gt;&lt;/ColumnInfo&gt;&lt;ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending"&gt;&lt;Name&gt;Path&lt;/Name&gt;&lt;Id&gt;Path&lt;/Id&gt;&lt;/ColumnInfo&gt;&lt;ColumnInfo Index="4" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending"&gt;&lt;Name&gt;Display Name&lt;/Name&gt;&lt;Id&gt;DisplayName&lt;/Id&gt;&lt;/ColumnInfo&gt;&lt;/Presentation&gt;</ViewConfiguration>
         <Visible>true</Visible>
         <Accessibility>Internal</Accessibility>
         <Id>WatcherNode.Stateview</Id>
-        <DisplayName>Watcher Node State</DisplayName>
-        <Description>Watcher Node</Description>
+        <DisplayName>Watcher Node State View</DisplayName>
+        <Description>Watcher Node State View</Description>
         <Target>UptimeRobot.WatcherNode</Target>
         <Category>Operations</Category>
       </CustomViewConfig>
