@@ -8,12 +8,12 @@
           <xsd:element minOccurs="0" name="SyncTime" type="xsd:string" />
           <xsd:element minOccurs="1" name="ID" type="xsd:integer" />
           <xsd:element minOccurs="1" name="APIkey" type="xsd:string" />
-          <xsd:element minOccurs="1" name="ResponseThreshold" type="xsd:integer" />
+          <!--<xsd:element minOccurs="0" name="ResponseThreshold" type="xsd:integer" /> -->
         </Configuration>
         <OverrideableParameters>
           <OverrideableParameter ID="Interval" Selector="$Config/IntervalSeconds$" ParameterType="int" />
           <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
-          <OverrideableParameter ID="ResponseThreshold" Selector="$Config/ResponseThreshold$" ParameterType="int" />
+          <!-- <OverrideableParameter ID="ResponseThreshold" Selector="$Config/ResponseThreshold$" ParameterType="int" /> -->
         </OverrideableParameters>
         <ModuleImplementation Isolation="Any">
           <Composite>
@@ -43,7 +43,7 @@
           <Composite>
             <MemberModules>
               <ProbeAction ID="PSScript" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
-                <ScriptName>GetMonitorsStatus.ps1</ScriptName>
+                <ScriptName>Get-WebsiteResponseTime.ps1</ScriptName>
                 <ScriptBody>
                   $IncludeFileContent/Health Model/Rules/Scripts/Get-WebSiteResponseTime.ps1$
                 </ScriptBody>
@@ -72,8 +72,8 @@
     <MonitorTypes>
       <UnitMonitorType ID="UptimeRobot.ManagementPack.Webcheck.ResponseTime.MonitorType" Accessibility="Public">
         <MonitorTypeStates>
-          <MonitorTypeState ID="CDStatusOK" NoDetection="false" />
-          <MonitorTypeState ID="CDStatusNOK" NoDetection="false" />
+          <MonitorTypeState ID="UnderThreshold" NoDetection="false" />
+          <MonitorTypeState ID="AboveThreshold" NoDetection="false" />
         </MonitorTypeStates>
         <Configuration>
           <xsd:element name="IntervalSeconds" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
@@ -81,6 +81,10 @@
           <xsd:element name="ID" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
           <xsd:element name="APIkey" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
           <xsd:element name="ResponseThreshold" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="ObjectName" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="CounterName" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="Value" type="xsd:double" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="NumSamples" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
         </Configuration>
         <OverrideableParameters>
           <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int"/>
@@ -88,6 +92,7 @@
           <OverrideableParameter ID="ID" Selector="$Config/ID$" ParameterType="int"/>
           <OverrideableParameter ID="APIkey" Selector="$Config/APIkey$" ParameterType="string"/>
           <OverrideableParameter ID="ResponseThreshold" Selector="$Config/ResponseThreshold$" ParameterType="int"/>
+          <OverrideableParameter ID="NumSamples" Selector="$Config/NumSamples$" ParameterType="int"/>
         </OverrideableParameters>
         <MonitorImplementation>
           <MemberModules>
@@ -96,44 +101,62 @@
               <SyncTime>$Config/SyncTime$</SyncTime>
               <ID>$Config/ID$</ID>
               <APIkey>$Config/APIkey$</APIkey>
-              <ResponseThreshold>$Config/ResponseThreshold$</ResponseThreshold>
             </DataSource>
-            <ConditionDetection ID="FilterCDStatusOK" TypeID="System!System.ExpressionFilter">
+            <ConditionDetection ID="Mapper" TypeID="Perf!System.Performance.DataGenericMapper">
+              <ObjectName>$Config/ObjectName$</ObjectName>
+              <CounterName>$Config/CounterName$</CounterName>
+              <InstanceName/>
+              <Value>$Data/Property[@Name='ResponseTime']$</Value>
+            </ConditionDetection>
+            <ConditionDetection ID="Average" TypeID="Perf!System.Performance.AveragerCondition">
+              <NumSamples>$Config/NumSamples$</NumSamples>
+            </ConditionDetection>
+            <ConditionDetection ID="CDUnderThreshold" TypeID="System!System.ExpressionFilter">
               <Expression>
                 <SimpleExpression>
                   <ValueExpression>
-                    <XPathQuery Type="Integer">Property[@Name='ResponseTime']</XPathQuery>
+                    <XPathQuery Type="Double">Value</XPathQuery>
                   </ValueExpression>
                   <Operator>LessEqual</Operator>
                   <ValueExpression>
-                    <Value Type="Integer">$Config/ResponseThreshold$</Value>
+                    <Value Type="Double">$Config/ResponseThreshold$</Value>
                   </ValueExpression>
                 </SimpleExpression>
               </Expression>
             </ConditionDetection>
-            <ConditionDetection ID="FilterCDStatusNOK" TypeID="System!System.ExpressionFilter">
+            <ConditionDetection ID="CDAboveThreshold" TypeID="System!System.ExpressionFilter">
               <Expression>
                 <SimpleExpression>
                   <ValueExpression>
-                    <XPathQuery Type="Integer">Property[@Name='ResponseTime']</XPathQuery>
+                    <XPathQuery Type="Double">Value</XPathQuery>
                   </ValueExpression>
                   <Operator>Greater</Operator>
                   <ValueExpression>
-                    <Value Type="Integer">$Config/ResponseThreshold$</Value>
+                    <Value Type="Double">$Config/ResponseThreshold$</Value>
                   </ValueExpression>
                 </SimpleExpression>
               </Expression>
             </ConditionDetection>
           </MemberModules>
           <RegularDetections>
-            <RegularDetection MonitorTypeStateID="CDStatusOK">
-              <Node ID="FilterCDStatusOK">
-                <Node ID="DS" />
+            <RegularDetection MonitorTypeStateID="UnderThreshold">
+              <Node ID="CDUnderThreshold">
+                <Node ID="Average">
+                  <Node ID="Mapper">
+                    <Node ID="DS">
+                    </Node>
+                  </Node>
+                </Node>
               </Node>
             </RegularDetection>
-            <RegularDetection MonitorTypeStateID="CDStatusNOK">
-              <Node ID="FilterCDStatusNOK">
-                <Node ID="DS" />
+            <RegularDetection MonitorTypeStateID="AboveThreshold">
+              <Node ID="CDAboveThreshold">
+                <Node ID="Average">
+                  <Node ID="Mapper">
+                    <Node ID="DS">
+                    </Node>
+                  </Node>
+                </Node>
               </Node>
             </RegularDetection>
           </RegularDetections>
