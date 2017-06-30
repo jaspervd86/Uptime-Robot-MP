@@ -14,11 +14,11 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
-    <GenerateSealed>False</GenerateSealed>
-    <Company>Realdolmen</Company>
-    <Copyright>Copyright (c) Realdolmen. All rights reserved.</Copyright>
+    <GenerateSealed>True</GenerateSealed>
+    <Company>VDIT</Company>
+    <Copyright>Copyright (c) VDIT. All rights reserved.</Copyright>
     <DelaySigning>False</DelaySigning>
-    <AssemblyOriginatorKeyFile>C:\TEMP\MPS\_SEAL\Key\RD.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>Z:\SCOM\SCOM Project\Documentation SCOM\Custom Management Packs\pairkey rd.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>false</DebugSymbols>
