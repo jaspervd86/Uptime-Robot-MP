@@ -40,9 +40,6 @@ Foreach($WebMonitor in $WebMonitors)
     #Fill up properties of class
         $instance.AddProperty("$MPElement[Name='UptimeRobot.WebCheck']/FriendlyName$", $WebMonitor.friendly_name)
         $instance.AddProperty("$MPElement[Name='UptimeRobot.WebCheck']/URL$", $WebMonitor.url)
-        $instance.AddProperty("$MPElement[Name='UptimeRobot.WebCheck']/Interval$", $WebMonitor.interval)
-        $instance.AddProperty("$MPElement[Name='UptimeRobot.WebCheck']/FriendlyName$", $WebMonitor.friendly_name)
-        $instance.AddProperty("$MPElement[Name='UptimeRobot.WebCheck']/Interval$", $WebMonitor.interval)
 		$instance.AddProperty("$MPElement[Name='UptimeRobot.WebCheck']/Type$", $type)
 			if($WebMonitor.port){$instance.AddProperty("$MPElement[Name='UptimeRobot.WebCheck']/Port$", $WebMonitor.port)}
 			if($WebMonitor.keyword_value){$instance.AddProperty("$MPElement[Name='UptimeRobot.WebCheck']/KeywordValue$", $WebMonitor.keyword_value)}
