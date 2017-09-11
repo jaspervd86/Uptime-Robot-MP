@@ -8,6 +8,7 @@ $api.LogScriptEvent("WebChecksDiscovery.ps1", 8001, 0, "Discovery Started")
 $Header = @{
     "Content-Type" = "application/x-www-form-urlencoded"
     "Cache-Control" = "no-cache"
+    
 }
 
 $body = @{
