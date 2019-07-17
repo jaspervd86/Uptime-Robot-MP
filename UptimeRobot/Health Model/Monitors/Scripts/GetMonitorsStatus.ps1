@@ -18,10 +18,15 @@ $body = @{
 
 $URL = 'https://api.uptimerobot.com/v2/getMonitors'
 
+Try{
 
+	$webMonitor = (Invoke-RestMethod -Method POST -uri $URL -Headers  $header -Body $body).monitors | where id -EQ $id
 
-$webMonitor = (Invoke-RestMethod -Method POST -uri $URL -Headers  $header -Body $body).monitors | where id -EQ $id
+}
 
+{
+	Catch { $api.LogScriptEvent($ScriptName, 10010, 2, "Failed to query the API, the error was: $Error" }
+}
 #Declare variables containing status
 [int]$strStatus = $WebMonitor.status
 
