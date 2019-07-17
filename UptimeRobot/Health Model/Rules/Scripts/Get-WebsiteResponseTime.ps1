@@ -8,6 +8,9 @@ $api = New-Object -comObject "MOM.ScriptAPI"
 $bag = $api.CreatePropertyBag()
 $ScriptName = "Get-WebSiteResponseTime.ps1"
 
+#Accept TLS1.2
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
 # Logging
 $api.LogScriptEvent($ScriptName,8106,0,"Getting Response time for $id")
 	$Header = @{

@@ -1,9 +1,15 @@
 <TemplateGroup>
   <Instances>
     <Instance ID="Instance1cb8bbbf42bb4bd8ba0ce5a2d4aaa2da" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.UnitMonitor" Version="1.0.0.0">
+<<<<<<< HEAD
       <UnitMonitorConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
         <MonitorType>UptimeRobot.ManagementPack.API.Status.MonitorType</MonitorType>
         <MonitorConfig>&lt;IntervalSeconds&gt;300&lt;/IntervalSeconds&gt;&lt;SyncTime&gt;12:00&lt;/SyncTime&gt;&lt;APIkey&gt;$Target/Property[Type='UptimeRobot.WatcherNode']/APIkey$&lt;/APIkey&gt;</MonitorConfig>
+=======
+      <UnitMonitorConfig xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <MonitorType>UptimeRobot.ManagementPack.Webcheck.Status.MonitorType</MonitorType>
+        <MonitorConfig>&lt;IntervalSeconds&gt;300&lt;/IntervalSeconds&gt;&lt;SyncTime&gt;12:00&lt;/SyncTime&gt;&lt;ID&gt;$Target/Property[Type='UptimeRobot.WebCheck']/ID$&lt;/ID&gt;&lt;APIkey&gt;$Target/Host/Property[Type='UptimeRobot.WatcherNode']/APIkey$&lt;/APIkey&gt;</MonitorConfig>
+>>>>>>> 0408be8e83508fcaf84eff79698b802b50aa57d1
         <MonitorOperationalStates>
           <OperationalState>
             <OperationalStateId>CDStatusOK</OperationalStateId>
@@ -46,7 +52,7 @@ This can be due to the following reasons:
       </UnitMonitorConfig>
     </Instance>
     <Instance ID="Instance575e4c17277a4b08978d7dbfad3d49d9" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.DependencyMonitor" Version="1.0.0.0">
-      <DependencyMonitorConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <DependencyMonitorConfig xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <Algorithm>
           <Algorithm>WorstOf</Algorithm>
         </Algorithm>

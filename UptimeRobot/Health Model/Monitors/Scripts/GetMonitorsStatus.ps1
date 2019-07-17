@@ -29,10 +29,15 @@ Try{
 
 }
 
+<<<<<<< HEAD
 Catch
 
 {
 	$api.LogScriptEvent($ScriptName, 10014, 2, "Failed to query the API, the error was: $Error")
+=======
+{
+	Catch { $api.LogScriptEvent($ScriptName, 10010, 2, "Failed to query the API, the error was: $Error" }
+>>>>>>> 0408be8e83508fcaf84eff79698b802b50aa57d1
 }
 #Declare variables containing status
 [int]$strStatus = $WebMonitor.status
