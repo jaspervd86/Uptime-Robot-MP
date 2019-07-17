@@ -1,7 +1,7 @@
 <TemplateGroup>
   <Instances>
     <Instance ID="Instance3d5876a2e98b4569931758d52012d10f" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.Discovery" Version="1.0.0.0">
-      <DiscoveryConfig xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <DiscoveryConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
         <Id>WebChecks.Discovery</Id>
         <DisplayName>Uptime Robot Web Checks Discovery</DisplayName>
         <Description>Discovers Web checks of Uptime Robot through the use of the API (JSON)</Description>
@@ -25,7 +25,7 @@
       </DiscoveryConfig>
     </Instance>
     <Instance ID="Instance638fa10331e14f6fb13f8c4c8ea9db63" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.Discovery" Version="1.0.0.0">
-      <DiscoveryConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <DiscoveryConfig xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <Id>WatcherNode.Discovery</Id>
         <DisplayName>Uptime Robot Watchernode Discovery</DisplayName>
         <Description>Checks for existing registry value Uptime robot HKLM\SOFTWARE\Uptimerobot</Description>

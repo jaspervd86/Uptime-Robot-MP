@@ -6,7 +6,7 @@
     <RootNamespace>UptimeRobot.ManagementPack</RootNamespace>
     <Name>UptimeRobot.ManagementPack</Name>
     <ManagementPackName>UptimeRobot.ManagementPack</ManagementPackName>
-    <Version>1.0.0.0</Version>
+    <Version>1.0.2.0</Version>
     <MpFrameworkVersion>v7.0.2</MpFrameworkVersion>
     <MpFrameworkProfile>OM</MpFrameworkProfile>
     <ProductVersion>1.1.0.0</ProductVersion>
@@ -15,10 +15,10 @@
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Debug\</OutputPath>
     <GenerateSealed>True</GenerateSealed>
-    <Company>VDIT</Company>
-    <Copyright>Copyright (c) VDIT. All rights reserved.</Copyright>
+    <Company>Monalytics</Company>
+    <Copyright>Copyright (c) Monalytics. All rights reserved.</Copyright>
     <DelaySigning>False</DelaySigning>
-    <AssemblyOriginatorKeyFile>Z:\SCOM\SCOM Project\Documentation SCOM\Custom Management Packs\pairkey rd.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>C:\managementpacksmonalytics\ManagementPacks\pairkey rd.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>false</DebugSymbols>
@@ -90,6 +90,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Health Model\Discoveries\Scripts\GetMonitors.ps1" />
+    <EmbeddedResource Include="Health Model\Monitors\Scripts\GetUptimeRobotAPIStatus.ps1" />
     <EmbeddedResource Include="Health Model\Monitors\Scripts\GetMonitorsStatus.ps1" />
     <EmbeddedResource Include="Health Model\Rules\Scripts\Get-WebsiteResponseTime.ps1" />
     <EmbeddedResource Include="Health Model\Tasks\Scripts\Add-NewMonitor.ps1" />
@@ -98,6 +99,9 @@
     <Compile Include="Health Model\Discoveries\Discoveries.mptg.mpx">
       <SubType>Code</SubType>
       <DependentUpon>Health Model\Discoveries\Discoveries.mptg</DependentUpon>
+    </Compile>
+    <Compile Include="Health Model\Monitors\API.Status.MonitorType.mpx">
+      <SubType>Code</SubType>
     </Compile>
     <Compile Include="Health Model\Monitors\Response.MonitorType.mpx">
       <SubType>Code</SubType>

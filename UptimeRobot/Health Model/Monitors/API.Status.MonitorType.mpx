@@ -2,11 +2,10 @@
   <TypeDefinitions>
     <ModuleTypes>
       <!-- Data Source -->
-      <DataSourceModuleType ID="UptimeRobot.ManagementPack.Webcheck.DataSource" Accessibility="Public" Batching="false" RunAs="UptimeRobot.ManagementPack.RunasProfile">
+      <DataSourceModuleType ID="UptimeRobot.ManagementPack.API.DataSource" Accessibility="Public" Batching="false" RunAs="UptimeRobot.ManagementPack.RunasProfile">
         <Configuration>
           <xsd:element minOccurs="1" name="IntervalSeconds" type="xsd:integer" />
           <xsd:element minOccurs="0" name="SyncTime" type="xsd:string" />
-          <xsd:element minOccurs="1" name="ID" type="xsd:integer" />
           <xsd:element minOccurs="1" name="APIkey" type="xsd:string" />
         </Configuration>
         <OverrideableParameters>
@@ -20,7 +19,7 @@
                 <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
                 <SyncTime>$Config/SyncTime$</SyncTime>
               </DataSource>
-              <ProbeAction ID="Probe" TypeID="UptimeRobot.ManagementPack.Webcheck.DataSource.PSScript" />
+              <ProbeAction ID="Probe" TypeID="UptimeRobot.ManagementPack.API.DataSource.PSScript" />
             </MemberModules>
             <Composition>
               <Node ID="Probe">
@@ -32,22 +31,17 @@
         <OutputType>System!System.PropertyBagData</OutputType>
       </DataSourceModuleType>
       <!-- Probe Action -->
-      <ProbeActionModuleType ID="UptimeRobot.ManagementPack.Webcheck.DataSource.PSScript" Accessibility="Public" Batching="false" PassThrough="false" RunAs="UptimeRobot.ManagementPack.RunasProfile">
+      <ProbeActionModuleType ID="UptimeRobot.ManagementPack.API.DataSource.PSScript" Accessibility="Public" Batching="false" PassThrough="false" RunAs="UptimeRobot.ManagementPack.RunasProfile">
         <Configuration>
-          <xsd:element minOccurs="0" name="ID" type="xsd:integer" />
           <xsd:element minOccurs="0" name="APIkey" type="xsd:string" />
         </Configuration>
         <ModuleImplementation Isolation="Any">
           <Composite>
             <MemberModules>
               <ProbeAction ID="PSScript" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
-                <ScriptName>GetMonitorsStatus.ps1</ScriptName>
-                <ScriptBody>$IncludeFileContent/Health Model/Monitors/Scripts/GetMonitorsStatus.ps1$</ScriptBody>
+                <ScriptName>GetUptimeRobotAPIStatus.ps1</ScriptName>
+                <ScriptBody>$IncludeFileContent/Health Model/Monitors/Scripts/GetUptimeRobotAPIStatus.ps1$</ScriptBody>
                 <Parameters>
-                  <Parameter>
-                    <Name>ID</Name>
-                    <Value>$Target/Property[Type='UptimeRobot.WebCheck']/ID$</Value>
-                  </Parameter>
                   <Parameter>
                     <Name>APIkey</Name>
                     <Value>$Target/Host/Property[Type='UptimeRobot.WatcherNode']/APIkey$</Value>
@@ -66,7 +60,7 @@
       </ProbeActionModuleType>
     </ModuleTypes>
     <MonitorTypes>
-      <UnitMonitorType ID="UptimeRobot.ManagementPack.Webcheck.Status.MonitorType" Accessibility="Public">
+      <UnitMonitorType ID="UptimeRobot.ManagementPack.API.Status.MonitorType" Accessibility="Public">
         <MonitorTypeStates>
           <MonitorTypeState ID="CDStatusOK" NoDetection="false" />
           <MonitorTypeState ID="CDStatusNOK" NoDetection="false" />
@@ -74,78 +68,49 @@
         <Configuration>
           <xsd:element name="IntervalSeconds" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
           <xsd:element name="SyncTime" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
-          <xsd:element name="ID" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
           <xsd:element name="APIkey" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
         </Configuration>
         <OverrideableParameters>
           <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int"/>
           <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string"/>
-          <OverrideableParameter ID="ID" Selector="$Config/ID$" ParameterType="int"/>
           <OverrideableParameter ID="APIkey" Selector="$Config/APIkey$" ParameterType="string"/>
         </OverrideableParameters>
         <MonitorImplementation>
           <MemberModules>
-            <DataSource ID="DS" TypeID="UptimeRobot.ManagementPack.Webcheck.DataSource">
+            <DataSource ID="DS" TypeID="UptimeRobot.ManagementPack.API.DataSource">
               <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
               <SyncTime>$Config/SyncTime$</SyncTime>
-              <ID>$Config/ID$</ID>
               <APIkey>$Config/APIkey$</APIkey>
             </DataSource>
             <ConditionDetection ID="FilterCDStatusOK" TypeID="System!System.ExpressionFilter">
               <Expression>
-                <And>
-                  <Expression>
-                    <SimpleExpression>
-                      <ValueExpression>
-                        <XPathQuery Type="Integer">Property[@Name='Status']</XPathQuery>
-                      </ValueExpression>
-                      <Operator>NotEqual</Operator>
-                      <ValueExpression>
-                        <Value Type="Integer">8</Value>
-                      </ValueExpression>
-                    </SimpleExpression>
-                  </Expression>
-                  <Expression>
-                    <SimpleExpression>
-                      <ValueExpression>
-                        <XPathQuery Type="Integer">Property[@Name='Status']</XPathQuery>
-                      </ValueExpression>
-                      <Operator>NotEqual</Operator>
-                      <ValueExpression>
-                        <Value Type="Integer">9</Value>
-                      </ValueExpression>
-                    </SimpleExpression>
-                  </Expression>
-                </And>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="String">Property[@Name='Status']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Equal</Operator>
+                  <ValueExpression>
+                    <Value Type="String">OK</Value>
+                  </ValueExpression>
+                </SimpleExpression>
               </Expression>
             </ConditionDetection>
             <ConditionDetection ID="FilterCDStatusNOK" TypeID="System!System.ExpressionFilter">
               <Expression>
-                <And>
-                  <Expression>
-                    <SimpleExpression>
-                      <ValueExpression>
-                        <XPathQuery Type="Integer">Property[@Name='Status']</XPathQuery>
-                      </ValueExpression>
-                      <Operator>Equal</Operator>
-                      <ValueExpression>
-                        <Value Type="Integer">9</Value>
-                      </ValueExpression>
-                    </SimpleExpression>
-                  </Expression>
-                  <Expression>
-                    <SimpleExpression>
-                      <ValueExpression>
-                        <XPathQuery Type="Integer">Property[@Name='Status']</XPathQuery>
-                      </ValueExpression>
-                      <Operator>Equal</Operator>
-                      <ValueExpression>
-                        <Value Type="Integer">8</Value>
-                      </ValueExpression>
-                    </SimpleExpression>
-                  </Expression>
-                </And>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="String">Property[@Name='Status']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Equal</Operator>
+                  <ValueExpression>
+                    <Value Type="String">NOK</Value>
+                  </ValueExpression>
+                </SimpleExpression>
               </Expression>
+              <SuppressionSettings>
+                <MatchCount>2</MatchCount>
+                <SampleCount>2</SampleCount>
+              </SuppressionSettings>
             </ConditionDetection>
           </MemberModules>
           <RegularDetections>

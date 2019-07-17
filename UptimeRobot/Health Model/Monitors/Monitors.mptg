@@ -2,6 +2,115 @@
   <Instances>
     <Instance ID="Instance1cb8bbbf42bb4bd8ba0ce5a2d4aaa2da" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.UnitMonitor" Version="1.0.0.0">
       <UnitMonitorConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <MonitorType>UptimeRobot.ManagementPack.API.Status.MonitorType</MonitorType>
+        <MonitorConfig>&lt;IntervalSeconds&gt;300&lt;/IntervalSeconds&gt;&lt;SyncTime&gt;12:00&lt;/SyncTime&gt;&lt;APIkey&gt;$Target/Property[Type='UptimeRobot.WatcherNode']/APIkey$&lt;/APIkey&gt;</MonitorConfig>
+        <MonitorOperationalStates>
+          <OperationalState>
+            <OperationalStateId>CDStatusOK</OperationalStateId>
+            <OperationalStateDisplayName>CDStatusOK</OperationalStateDisplayName>
+            <MonitorTypeStateId>CDStatusOK</MonitorTypeStateId>
+            <HealthState>Success</HealthState>
+          </OperationalState>
+          <OperationalState>
+            <OperationalStateId>CDStatusNOK</OperationalStateId>
+            <OperationalStateDisplayName>CDStatusNOK</OperationalStateDisplayName>
+            <MonitorTypeStateId>CDStatusNOK</MonitorTypeStateId>
+            <HealthState>Error</HealthState>
+          </OperationalState>
+        </MonitorOperationalStates>
+        <MonitorRunAs>UptimeRobot.ManagementPack.RunasProfile</MonitorRunAs>
+        <ParentMonitor>Health!System.Health.AvailabilityState</ParentMonitor>
+        <Accessibility>Internal</Accessibility>
+        <Id>API.Status.Monitor</Id>
+        <DisplayName>API Status Monitor</DisplayName>
+        <Description>Evaluates the status of API by queryign the monitors. </Description>
+        <Target>UptimeRobot.WatcherNode</Target>
+        <Enabled>true</Enabled>
+        <Category>AvailabilityHealth</Category>
+        <Remotable>true</Remotable>
+        <Priority>Normal</Priority>
+        <AlertAutoResolve>true</AlertAutoResolve>
+        <AlertOnState>Error</AlertOnState>
+        <AlertPriority>Normal</AlertPriority>
+        <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+        <AlertName>Uptime Robot Webcheck Status Alert</AlertName>
+        <AlertDescription>The Uptime Robot API (URL: $Data/Context/Property[@Name='URL']$) does not seem available. 
+The error was:
+$Data/Context/Property[@Name='Error']$
+
+This can be due to the following reasons:
+- Proxy issues. Make sure the username and password of the UptimeRobot Runas Profile is configured.
+- The API is down effectively. Please check with UptimeRobot
+</AlertDescription>
+        <ConfirmDelivery>false</ConfirmDelivery>
+      </UnitMonitorConfig>
+    </Instance>
+    <Instance ID="Instance575e4c17277a4b08978d7dbfad3d49d9" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.DependencyMonitor" Version="1.0.0.0">
+      <DependencyMonitorConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <Algorithm>
+          <Algorithm>WorstOf</Algorithm>
+        </Algorithm>
+        <MemberMonitor>Health!System.Health.AvailabilityState</MemberMonitor>
+        <MemberInMaintenance>Ignore</MemberInMaintenance>
+        <MemberUnavailable>Ignore</MemberUnavailable>
+        <RelationshipType>UptimeRobotNodeHostsChecks</RelationshipType>
+        <ParentMonitor>Health!System.Health.AvailabilityState</ParentMonitor>
+        <Accessibility>Internal</Accessibility>
+        <Id>Webchecks.Dependency.Monitor</Id>
+        <DisplayName>Uptime Robot Webchecks Dependency Monitor</DisplayName>
+        <Description>Dependency monitor for Uptime Robot webchecks</Description>
+        <Target>UptimeRobot.WatcherNode</Target>
+        <Enabled>true</Enabled>
+        <Category>AvailabilityHealth</Category>
+        <Remotable>true</Remotable>
+        <Priority>Normal</Priority>
+        <AlertAutoResolve>true</AlertAutoResolve>
+        <AlertOnState>None</AlertOnState>
+        <AlertPriority>Normal</AlertPriority>
+        <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+      </DependencyMonitorConfig>
+    </Instance>
+    <Instance ID="Instanceff9ec30b70b543a684fd6e5d60b0a0d2" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.UnitMonitor" Version="1.0.0.0">
+      <UnitMonitorConfig xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <MonitorType>UptimeRobot.ManagementPack.Webcheck.ResponseTime.MonitorType</MonitorType>
+        <MonitorConfig>&lt;IntervalSeconds&gt;300&lt;/IntervalSeconds&gt;&lt;SyncTime&gt;12:00&lt;/SyncTime&gt;&lt;ID&gt;$Target/Property[Type='UptimeRobot.WebCheck']/ID$&lt;/ID&gt;&lt;APIkey&gt;$Target/Host/Property[Type='UptimeRobot.WatcherNode']/APIkey$&lt;/APIkey&gt;&lt;ResponseThreshold&gt;500&lt;/ResponseThreshold&gt;&lt;ObjectName&gt;$Target/Property[Type='UptimeRobot.WebCheck']/FriendlyName$&lt;/ObjectName&gt;&lt;CounterName&gt;Response Time (ms)&lt;/CounterName&gt;&lt;Value&gt;$Data/Value$&lt;/Value&gt;&lt;NumSamples&gt;3&lt;/NumSamples&gt;</MonitorConfig>
+        <MonitorOperationalStates>
+          <OperationalState>
+            <OperationalStateId>UnderThreshold</OperationalStateId>
+            <OperationalStateDisplayName>UnderThreshold</OperationalStateDisplayName>
+            <MonitorTypeStateId>UnderThreshold</MonitorTypeStateId>
+            <HealthState>Success</HealthState>
+          </OperationalState>
+          <OperationalState>
+            <OperationalStateId>AboveThreshold</OperationalStateId>
+            <OperationalStateDisplayName>AboveThreshold</OperationalStateDisplayName>
+            <MonitorTypeStateId>AboveThreshold</MonitorTypeStateId>
+            <HealthState>Error</HealthState>
+          </OperationalState>
+        </MonitorOperationalStates>
+        <ParentMonitor>Health!System.Health.AvailabilityState</ParentMonitor>
+        <Accessibility>Internal</Accessibility>
+        <Id>ResponseTime.Monitor</Id>
+        <DisplayName>Webcheck Response Time Monitor</DisplayName>
+        <Description>Monitors the response time of the website, when it exceeds the threshold, an alert will be triggered.</Description>
+        <Target>UptimeRobot.WebCheck</Target>
+        <Enabled>false</Enabled>
+        <Category>AvailabilityHealth</Category>
+        <Remotable>true</Remotable>
+        <Priority>Normal</Priority>
+        <AlertAutoResolve>true</AlertAutoResolve>
+        <AlertOnState>Error</AlertOnState>
+        <AlertPriority>Normal</AlertPriority>
+        <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+        <AlertName>Uptime Robot Webcheck Response Time Alert</AlertName>
+        <AlertDescription>An external facing website $Target/Property[Type='UptimeRobot.WebCheck']/FriendlyName$ is responding slowly, the average responsetime is $Data/Context/Value$
+
+</AlertDescription>
+        <ConfirmDelivery>false</ConfirmDelivery>
+      </UnitMonitorConfig>
+    </Instance>
+    <Instance ID="Instance1f7f6d6fb09749f5b6f8c8ca6afc52d5" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.UnitMonitor" Version="1.0.0.0">
+      <UnitMonitorConfig xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <MonitorType>UptimeRobot.ManagementPack.Webcheck.Status.MonitorType</MonitorType>
         <MonitorConfig>&lt;IntervalSeconds&gt;300&lt;/IntervalSeconds&gt;&lt;SyncTime&gt;12:00&lt;/SyncTime&gt;&lt;ID&gt;$Target/Property[Type='UptimeRobot.WebCheck']/ID$&lt;/ID&gt;&lt;APIkey&gt;$Target/Host/Property[Type='UptimeRobot.WatcherNode']/APIkey$&lt;/APIkey&gt;</MonitorConfig>
         <MonitorOperationalStates>
@@ -41,70 +150,6 @@ These are the possible states:
 2 - up 
 8 - seems down 
 9 - down 
-</AlertDescription>
-        <ConfirmDelivery>false</ConfirmDelivery>
-      </UnitMonitorConfig>
-    </Instance>
-    <Instance ID="Instance575e4c17277a4b08978d7dbfad3d49d9" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.DependencyMonitor" Version="1.0.0.0">
-      <DependencyMonitorConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-        <Algorithm>
-          <Algorithm>WorstOf</Algorithm>
-        </Algorithm>
-        <MemberMonitor>Health!System.Health.AvailabilityState</MemberMonitor>
-        <MemberInMaintenance>Ignore</MemberInMaintenance>
-        <MemberUnavailable>Ignore</MemberUnavailable>
-        <RelationshipType>UptimeRobotNodeHostsChecks</RelationshipType>
-        <ParentMonitor>Health!System.Health.AvailabilityState</ParentMonitor>
-        <Accessibility>Internal</Accessibility>
-        <Id>Webchecks.Dependency.Monitor</Id>
-        <DisplayName>Uptime Robot Webchecks Dependency Monitor</DisplayName>
-        <Description>Dependency monitor for Uptime Robot webchecks</Description>
-        <Target>UptimeRobot.WatcherNode</Target>
-        <Enabled>true</Enabled>
-        <Category>AvailabilityHealth</Category>
-        <Remotable>true</Remotable>
-        <Priority>Normal</Priority>
-        <AlertAutoResolve>true</AlertAutoResolve>
-        <AlertOnState>None</AlertOnState>
-        <AlertPriority>Normal</AlertPriority>
-        <AlertSeverity>MatchMonitorHealth</AlertSeverity>
-      </DependencyMonitorConfig>
-    </Instance>
-    <Instance ID="Instanceff9ec30b70b543a684fd6e5d60b0a0d2" Type="Microsoft.SystemCenter.Authoring.CodeGeneration.Monitoring.UnitMonitor" Version="1.0.0.0">
-      <UnitMonitorConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-        <MonitorType>UptimeRobot.ManagementPack.Webcheck.ResponseTime.MonitorType</MonitorType>
-        <MonitorConfig>&lt;IntervalSeconds&gt;300&lt;/IntervalSeconds&gt;&lt;SyncTime&gt;12:00&lt;/SyncTime&gt;&lt;ID&gt;$Target/Property[Type='UptimeRobot.WebCheck']/ID$&lt;/ID&gt;&lt;APIkey&gt;$Target/Host/Property[Type='UptimeRobot.WatcherNode']/APIkey$&lt;/APIkey&gt;&lt;ResponseThreshold&gt;500&lt;/ResponseThreshold&gt;&lt;ObjectName&gt;$Target/Property[Type='UptimeRobot.WebCheck']/FriendlyName$&lt;/ObjectName&gt;&lt;CounterName&gt;Response Time (ms)&lt;/CounterName&gt;&lt;Value&gt;$Data/Value$&lt;/Value&gt;&lt;NumSamples&gt;3&lt;/NumSamples&gt;</MonitorConfig>
-        <MonitorOperationalStates>
-          <OperationalState>
-            <OperationalStateId>UnderThreshold</OperationalStateId>
-            <OperationalStateDisplayName>UnderThreshold</OperationalStateDisplayName>
-            <MonitorTypeStateId>UnderThreshold</MonitorTypeStateId>
-            <HealthState>Success</HealthState>
-          </OperationalState>
-          <OperationalState>
-            <OperationalStateId>AboveThreshold</OperationalStateId>
-            <OperationalStateDisplayName>AboveThreshold</OperationalStateDisplayName>
-            <MonitorTypeStateId>AboveThreshold</MonitorTypeStateId>
-            <HealthState>Error</HealthState>
-          </OperationalState>
-        </MonitorOperationalStates>
-        <ParentMonitor>Health!System.Health.AvailabilityState</ParentMonitor>
-        <Accessibility>Internal</Accessibility>
-        <Id>ResponseTime.Monitor</Id>
-        <DisplayName>Webcheck Response Time Monitor</DisplayName>
-        <Description>Monitors the response time of the website, when it exceeds the threshold, an alert will be triggered.</Description>
-        <Target>UptimeRobot.WebCheck</Target>
-        <Enabled>true</Enabled>
-        <Category>AvailabilityHealth</Category>
-        <Remotable>true</Remotable>
-        <Priority>Normal</Priority>
-        <AlertAutoResolve>true</AlertAutoResolve>
-        <AlertOnState>Error</AlertOnState>
-        <AlertPriority>Normal</AlertPriority>
-        <AlertSeverity>MatchMonitorHealth</AlertSeverity>
-        <AlertName>Uptime Robot Webcheck Response Time Alert</AlertName>
-        <AlertDescription>An external facing website $Target/Property[Type='UptimeRobot.WebCheck']/FriendlyName$ is responding slowly, the average responsetime is $Data/Context/Value$
-
 </AlertDescription>
         <ConfirmDelivery>false</ConfirmDelivery>
       </UnitMonitorConfig>
