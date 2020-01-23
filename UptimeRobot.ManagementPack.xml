@@ -1,0 +1,1478 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ManagementPack SchemaVersion="2.0" ContentReadable="true" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Manifest>
+    <Identity>
+      <ID>UptimeRobot.ManagementPack</ID>
+      <Version>1.0.2.8</Version>
+    </Identity>
+    <Name>UptimeRobot.ManagementPack</Name>
+    <References>
+      <Reference Alias="MSDL">
+        <ID>Microsoft.SystemCenter.DataWarehouse.Library</ID>
+        <Version>7.1.10226.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="SC">
+        <ID>Microsoft.SystemCenter.Library</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="Windows">
+        <ID>Microsoft.Windows.Library</ID>
+        <Version>7.5.8501.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="Health">
+        <ID>System.Health.Library</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="System">
+        <ID>System.Library</ID>
+        <Version>7.5.8501.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+      <Reference Alias="Perf">
+        <ID>System.Performance.Library</ID>
+        <Version>7.0.8433.0</Version>
+        <PublicKeyToken>31bf3856ad364e35</PublicKeyToken>
+      </Reference>
+    </References>
+  </Manifest>
+  <TypeDefinitions>
+    <EntityTypes>
+      <ClassTypes>
+        <ClassType ID="UptimeRobot.WatcherNode" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.ComputerRole" Hosted="true" Singleton="false" Extension="false">
+          <Property ID="APIkey" Type="string" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+        </ClassType>
+        <ClassType ID="UptimeRobot.WebCheck" Accessibility="Public" Abstract="false" Base="Windows!Microsoft.Windows.ApplicationComponent" Hosted="true" Singleton="false" Extension="false">
+          <Property ID="ID" Type="int" AutoIncrement="false" Key="true" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="FriendlyName" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="URL" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="Interval" Type="int" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="KeywordValue" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="KeywordType" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="HTTPUserName" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="Port" Type="int" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+          <Property ID="Type" Type="string" AutoIncrement="false" Key="false" CaseSensitive="false" MaxLength="256" MinLength="0" Required="false" Scale="0" />
+        </ClassType>
+      </ClassTypes>
+      <RelationshipTypes>
+        <RelationshipType ID="UptimeRobotNodeHostsChecks" Accessibility="Public" Abstract="false" Base="System!System.Hosting">
+          <Source ID="src" MinCardinality="0" MaxCardinality="2147483647" Type="UptimeRobot.WatcherNode" />
+          <Target ID="trgt" MinCardinality="0" MaxCardinality="2147483647" Type="UptimeRobot.WebCheck" />
+        </RelationshipType>
+      </RelationshipTypes>
+    </EntityTypes>
+    <SecureReferences>
+      <SecureReference ID="UptimeRobot.ManagementPack.RunasProfile" Accessibility="Public" />
+    </SecureReferences>
+    <ModuleTypes>
+      <DataSourceModuleType ID="UptimeRobot.ManagementPack.API.DataSource" Accessibility="Public" Batching="false" RunAs="UptimeRobot.ManagementPack.RunasProfile">
+        <Configuration>
+          <xsd:element minOccurs="1" name="IntervalSeconds" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element minOccurs="0" name="SyncTime" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element minOccurs="1" name="APIkey" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="Interval" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <DataSource ID="Schedule" TypeID="System!System.SimpleScheduler">
+                <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+                <SyncTime>$Config/SyncTime$</SyncTime>
+              </DataSource>
+              <ProbeAction ID="Probe" TypeID="UptimeRobot.ManagementPack.API.DataSource.PSScript" />
+            </MemberModules>
+            <Composition>
+              <Node ID="Probe">
+                <Node ID="Schedule" />
+              </Node>
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+      </DataSourceModuleType>
+      <DataSourceModuleType ID="UptimeRobot.ManagementPack.WebCheck.ResponseTime.DataSource" Accessibility="Public" Batching="false" RunAs="UptimeRobot.ManagementPack.RunasProfile">
+        <Configuration>
+          <xsd:element minOccurs="1" name="IntervalSeconds" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element minOccurs="0" name="SyncTime" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element minOccurs="1" name="ID" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element minOccurs="1" name="APIkey" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <!--<xsd:element minOccurs="0" name="ResponseThreshold" type="xsd:integer" /> -->
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="Interval" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
+          <!-- <OverrideableParameter ID="ResponseThreshold" Selector="$Config/ResponseThreshold$" ParameterType="int" /> -->
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <DataSource ID="Schedule" TypeID="System!System.SimpleScheduler">
+                <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+                <SyncTime>$Config/SyncTime$</SyncTime>
+              </DataSource>
+              <ProbeAction ID="Probe" TypeID="UptimeRobot.ManagementPack.WebCheck.ResponseTime.DataSource.PSScript" />
+            </MemberModules>
+            <Composition>
+              <Node ID="Probe">
+                <Node ID="Schedule" />
+              </Node>
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+      </DataSourceModuleType>
+      <DataSourceModuleType ID="UptimeRobot.ManagementPack.Webcheck.DataSource" Accessibility="Public" Batching="false" RunAs="UptimeRobot.ManagementPack.RunasProfile">
+        <Configuration>
+          <xsd:element minOccurs="1" name="IntervalSeconds" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element minOccurs="0" name="SyncTime" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element minOccurs="1" name="ID" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element minOccurs="1" name="APIkey" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="Interval" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <DataSource ID="Schedule" TypeID="System!System.SimpleScheduler">
+                <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+                <SyncTime>$Config/SyncTime$</SyncTime>
+              </DataSource>
+              <ProbeAction ID="Probe" TypeID="UptimeRobot.ManagementPack.Webcheck.DataSource.PSScript" />
+            </MemberModules>
+            <Composition>
+              <Node ID="Probe">
+                <Node ID="Schedule" />
+              </Node>
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+      </DataSourceModuleType>
+      <DataSourceModuleType ID="UptimeRobot.WebCheck.ResponseTimeScript.DS" Accessibility="Internal" Batching="false">
+        <Configuration>
+          <xsd:element type="xsd:integer" name="TimeoutSeconds" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element type="xsd:integer" name="IntervalSeconds" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element type="xsd:string" name="apiKey" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <DataSource ID="Scheduler" TypeID="System!System.Scheduler">
+                <Scheduler>
+                  <SimpleReccuringSchedule>
+                    <Interval Unit="Seconds">$Config/IntervalSeconds$</Interval>
+                  </SimpleReccuringSchedule>
+                  <ExcludeDates />
+                </Scheduler>
+              </DataSource>
+              <ProbeAction ID="Probe" TypeID="UptimeRobot.WebCheck.ResponseTimeScript.PA">
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="Probe">
+                <Node ID="Scheduler" />
+              </Node>
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+      </DataSourceModuleType>
+      <ProbeActionModuleType ID="UptimeRobot.ManagementPack.API.DataSource.PSScript" Accessibility="Public" Batching="false" PassThrough="false" RunAs="UptimeRobot.ManagementPack.RunasProfile">
+        <Configuration>
+          <xsd:element minOccurs="0" name="APIkey" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <ProbeAction ID="PSScript" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
+                <ScriptName>GetUptimeRobotAPIStatus.ps1</ScriptName>
+                <ScriptBody><![CDATA[param($APIkey)
+
+#Create monitor property bag
+$api = new-object -comObject 'MOM.ScriptAPI'
+$bag = $api.CreatePropertyBag()
+
+#Accept TLS1.2
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+#check Uptime Robot status page
+$Header = @{
+    "Content-Type" = "application/x-www-form-urlencoded"
+    "Cache-Control" = "no-cache"
+    
+}
+
+$body = @{
+	"api_key" = $APIkey
+	"time_zone" = "1"
+	"format" = "json"
+}
+
+$URL = 'https://api.uptimerobot.com/v2/getMonitors'
+
+Try{
+
+	$webMonitor = Invoke-RestMethod -Method POST -uri $URL -Headers  $header -Body $body
+	If($webMonitor)
+		{
+			$bag.AddValue('Status',"NOK")
+			$bag.AddValue('URL',$URL)
+		}
+	Else
+		{
+			$bag.AddValue('Status',"OK")
+			$bag.AddValue('URL',$URL)
+		}
+}
+Catch
+{
+	$api.LogScriptEvent($ScriptName, 10016, 2, "Failed to query the API, the error was: $Error")
+	$bag.AddValue('Error',$Error)
+}
+
+]]></ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>APIkey</Name>
+                    <Value>$Target/Host/Property[Type='UptimeRobot.WatcherNode']/APIkey$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>300</TimeoutSeconds>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="PSScript" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+        <TriggerOnly>true</TriggerOnly>
+      </ProbeActionModuleType>
+      <ProbeActionModuleType ID="UptimeRobot.ManagementPack.WebCheck.ResponseTime.DataSource.PSScript" Accessibility="Public" Batching="false" PassThrough="false" RunAs="UptimeRobot.ManagementPack.RunasProfile">
+        <Configuration>
+          <xsd:element minOccurs="0" name="ID" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element minOccurs="0" name="APIkey" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <ProbeAction ID="PSScript" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
+                <ScriptName>Get-WebsiteResponseTime.ps1</ScriptName>
+                <ScriptBody>
+                  <![CDATA[param(
+$id,
+$apiKey                  
+)
+                  
+# Add the SCOM API and Propertybag for output
+$api = New-Object -comObject "MOM.ScriptAPI"
+$bag = $api.CreatePropertyBag()
+$ScriptName = "Get-WebSiteResponseTime.ps1"
+
+# Logging
+$api.LogScriptEvent($ScriptName,8106,0,"Getting Response time for $id")
+	$Header = @{
+	"Content-Type" = "application/x-www-form-urlencoded"
+	"Cache-Control" = "no-cache"
+
+	}
+
+	$body = @{
+	"api_key" = $apiKey
+	"time_zone" = "1"
+	"format" = "json"
+	"response_times" = "1"
+	}
+
+$URL = 'https://api.uptimerobot.com/v2/getMonitors'
+
+$webMonitor = (Invoke-RestMethod -Method POST -uri $URL -Headers  $header -Body $body).monitors | where id -EQ $id
+[int]$ResponseTime = ($webMonitor.Response_times | select -First 1).Value
+
+#Adding the value from the script into the propertybag
+$bag.AddValue("ResponseTime", $ResponseTime)
+
+#Logging
+$api.LogScriptEvent($ScriptName,8107,0,"$ScriptName script is complete")
+
+#Outputting the bag
+$bag]]>
+                </ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>ID</Name>
+                    <Value>$Target/Property[Type='UptimeRobot.WebCheck']/ID$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>APIkey</Name>
+                    <Value>$Target/Host/Property[Type='UptimeRobot.WatcherNode']/APIkey$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>300</TimeoutSeconds>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="PSScript" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+        <TriggerOnly>true</TriggerOnly>
+      </ProbeActionModuleType>
+      <ProbeActionModuleType ID="UptimeRobot.ManagementPack.Webcheck.DataSource.PSScript" Accessibility="Public" Batching="false" PassThrough="false" RunAs="UptimeRobot.ManagementPack.RunasProfile">
+        <Configuration>
+          <xsd:element minOccurs="0" name="ID" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element minOccurs="0" name="APIkey" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <ProbeAction ID="PSScript" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
+                <ScriptName>GetMonitorsStatus.ps1</ScriptName>
+                <ScriptBody><![CDATA[param($ID,$APIkey)
+
+#Create monitor property bag
+$api = new-object -comObject 'MOM.ScriptAPI'
+$bag = $api.CreatePropertyBag() 
+#check Uptime Robot status page
+
+#Accept TLS1.2
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+
+$Header = @{
+    "Content-Type" = "application/x-www-form-urlencoded"
+    "Cache-Control" = "no-cache"
+    
+}
+
+$body = @{
+	"api_key" = $APIkey
+	"time_zone" = "1"
+	"format" = "json"
+}
+
+$URL = 'https://api.uptimerobot.com/v2/getMonitors'
+
+Try{
+
+	$webMonitor = (Invoke-RestMethod -Method POST -uri $URL -Headers  $header -Body $body).monitors | where id -EQ $id
+
+}
+
+Catch
+
+{
+	$api.LogScriptEvent($ScriptName, 10014, 2, "Failed to query the API, the error was: $Error")
+}
+#Declare variables containing status
+[int]$strStatus = $WebMonitor.status
+
+#add the values to the bag
+$bag.AddValue('Status', $strStatus)
+$bag 
+
+]]></ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>ID</Name>
+                    <Value>$Target/Property[Type='UptimeRobot.WebCheck']/ID$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>APIkey</Name>
+                    <Value>$Target/Host/Property[Type='UptimeRobot.WatcherNode']/APIkey$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>300</TimeoutSeconds>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="PSScript" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+        <TriggerOnly>true</TriggerOnly>
+      </ProbeActionModuleType>
+      <ProbeActionModuleType ID="UptimeRobot.WebCheck.ResponseTimeScript.PA" Accessibility="Internal" Batching="false" PassThrough="false" RunAs="UptimeRobot.ManagementPack.RunasProfile">
+        <Configuration>
+          <xsd:element type="xsd:integer" name="TimeoutSeconds" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <ProbeAction ID="Probe" TypeID="Windows!Microsoft.Windows.PowerShellPropertyBagTriggerOnlyProbe">
+                <ScriptName>Get-WebSiteResponseTime.ps1</ScriptName>
+                <ScriptBody>
+                  <![CDATA[param(
+$id,
+$apiKey                  
+)
+                  
+# Add the SCOM API and Propertybag for output
+$api = New-Object -comObject "MOM.ScriptAPI"
+$bag = $api.CreatePropertyBag()
+$ScriptName = "Get-WebSiteResponseTime.ps1"
+
+# Logging
+$api.LogScriptEvent($ScriptName,8106,0,"Getting Response time for $id")
+	$Header = @{
+	"Content-Type" = "application/x-www-form-urlencoded"
+	"Cache-Control" = "no-cache"
+
+	}
+
+	$body = @{
+	"api_key" = $apiKey
+	"time_zone" = "1"
+	"format" = "json"
+	"response_times" = "1"
+	}
+
+$URL = 'https://api.uptimerobot.com/v2/getMonitors'
+
+$webMonitor = (Invoke-RestMethod -Method POST -uri $URL -Headers  $header -Body $body).monitors | where id -EQ $id
+[int]$ResponseTime = ($webMonitor.Response_times | select -First 1).Value
+
+#Adding the value from the script into the propertybag
+$bag.AddValue("ResponseTime", $ResponseTime)
+
+#Logging
+$api.LogScriptEvent($ScriptName,8107,0,"$ScriptName script is complete")
+
+#Outputting the bag
+$bag]]>
+                </ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>apiKey</Name>
+                    <Value>$Target/Host/Property[Type='UptimeRobot.WatcherNode']/APIkey$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>ID</Name>
+                    <Value>$Target/Property[Type='UptimeRobot.WebCheck']/ID$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              </ProbeAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="Probe" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.PropertyBagData</OutputType>
+        <TriggerOnly>true</TriggerOnly>
+      </ProbeActionModuleType>
+      <WriteActionModuleType ID="UptimeRobot.AddNewMonitor.Task.WA" Accessibility="Internal" Batching="false">
+        <Configuration>
+          <xsd:element minOccurs="1" name="newUrl" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element minOccurs="1" name="name" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element minOccurs="1" name="interval" type="xsd:int" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element minOccurs="1" name="APIKey" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element minOccurs="1" name="TimeoutSeconds" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="newURL" Selector="$Config/newUrl$" ParameterType="string" />
+          <OverrideableParameter ID="name" Selector="$Config/name$" ParameterType="string" />
+          <OverrideableParameter ID="interval" Selector="$Config/interval$" ParameterType="int" />
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <WriteAction ID="PSWA" TypeID="Windows!Microsoft.Windows.PowerShellWriteAction">
+                <ScriptName>UptimeRobot.AddNewMonitor.ps1</ScriptName>
+                <ScriptBody>
+                  param(
+    [Parameter(Mandatory=$true)]
+    [string]$newUrl,
+    [Parameter(Mandatory=$true)]
+    [string]$name,
+    [Parameter(Mandatory=$true)]
+    [int]$interval,
+	[Parameter(Mandatory=$true)]
+    [string]$APIKey
+)
+
+#Create Discovery Property Bag
+$api = new-object -comObject 'MOM.ScriptAPI'
+$api.LogScriptEvent("Add-NewMonitor.ps1", 8004, 0, "TASK started: Adding a new Uptime Robot monitor")
+
+$Header = @{
+    "Content-Type" = "application/x-www-form-urlencoded"
+    "Cache-Control" = "no-cache"
+    
+}
+
+$body = @{
+	"api_key" = $APIKey
+    "url" = $newUrl
+    "friendly_name" = $name
+    "type" = "1"
+    "interval" = $interval
+}
+
+$URL = 'https://api.uptimerobot.com/v2/newMonitor'
+
+$newMonitor = (Invoke-RestMethod -Method POST -uri $URL -Headers  $header -Body $body)
+if ($newMonitor.stat -ne "ok")
+    {
+        Write-Output "Failed to create monitor for $newUrl"
+    }
+
+else
+    {
+        Write-Output $newMonitor.monitor
+    }
+
+$api.LogScriptEvent("Add-NewMonitor.ps1", 8005, 0, "TASK executed: Adding a new Uptime Robot monitor")
+  
+                </ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>newUrl</Name>
+                    <Value>$Config/newUrl$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>name</Name>
+                    <Value>$Config/name$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>interval</Name>
+                    <Value>$Config/interval$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>APIKey</Name>
+                    <Value>$Config/APIKey$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              </WriteAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="PSWA" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <OutputType>System!System.BaseData</OutputType>
+        <InputType>System!System.BaseData</InputType>
+      </WriteActionModuleType>
+    </ModuleTypes>
+    <MonitorTypes>
+      <UnitMonitorType ID="UptimeRobot.ManagementPack.API.Status.MonitorType" Accessibility="Public">
+        <MonitorTypeStates>
+          <MonitorTypeState ID="CDStatusOK" NoDetection="false" />
+          <MonitorTypeState ID="CDStatusNOK" NoDetection="false" />
+        </MonitorTypeStates>
+        <Configuration>
+          <xsd:element name="IntervalSeconds" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="SyncTime" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="APIkey" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
+          <OverrideableParameter ID="APIkey" Selector="$Config/APIkey$" ParameterType="string" />
+        </OverrideableParameters>
+        <MonitorImplementation>
+          <MemberModules>
+            <DataSource ID="DS" TypeID="UptimeRobot.ManagementPack.API.DataSource">
+              <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+              <SyncTime>$Config/SyncTime$</SyncTime>
+              <APIkey>$Config/APIkey$</APIkey>
+            </DataSource>
+            <ConditionDetection ID="FilterCDStatusOK" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="String">Property[@Name='Status']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Equal</Operator>
+                  <ValueExpression>
+                    <Value Type="String">OK</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+              </Expression>
+            </ConditionDetection>
+            <ConditionDetection ID="FilterCDStatusNOK" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="String">Property[@Name='Status']</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Equal</Operator>
+                  <ValueExpression>
+                    <Value Type="String">NOK</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+              </Expression>
+              <SuppressionSettings>
+                <MatchCount>2</MatchCount>
+                <SampleCount>2</SampleCount>
+              </SuppressionSettings>
+            </ConditionDetection>
+          </MemberModules>
+          <RegularDetections>
+            <RegularDetection MonitorTypeStateID="CDStatusOK">
+              <Node ID="FilterCDStatusOK">
+                <Node ID="DS" />
+              </Node>
+            </RegularDetection>
+            <RegularDetection MonitorTypeStateID="CDStatusNOK">
+              <Node ID="FilterCDStatusNOK">
+                <Node ID="DS" />
+              </Node>
+            </RegularDetection>
+          </RegularDetections>
+        </MonitorImplementation>
+      </UnitMonitorType>
+      <UnitMonitorType ID="UptimeRobot.ManagementPack.Webcheck.ResponseTime.MonitorType" Accessibility="Public">
+        <MonitorTypeStates>
+          <MonitorTypeState ID="UnderThreshold" NoDetection="false" />
+          <MonitorTypeState ID="AboveThreshold" NoDetection="false" />
+        </MonitorTypeStates>
+        <Configuration>
+          <xsd:element name="IntervalSeconds" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="SyncTime" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="ID" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="APIkey" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="ResponseThreshold" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="ObjectName" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="CounterName" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="Value" type="xsd:double" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="NumSamples" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
+          <OverrideableParameter ID="ID" Selector="$Config/ID$" ParameterType="int" />
+          <OverrideableParameter ID="APIkey" Selector="$Config/APIkey$" ParameterType="string" />
+          <OverrideableParameter ID="ResponseThreshold" Selector="$Config/ResponseThreshold$" ParameterType="int" />
+          <OverrideableParameter ID="NumSamples" Selector="$Config/NumSamples$" ParameterType="int" />
+        </OverrideableParameters>
+        <MonitorImplementation>
+          <MemberModules>
+            <DataSource ID="DS" TypeID="UptimeRobot.ManagementPack.WebCheck.ResponseTime.DataSource">
+              <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+              <SyncTime>$Config/SyncTime$</SyncTime>
+              <ID>$Config/ID$</ID>
+              <APIkey>$Config/APIkey$</APIkey>
+            </DataSource>
+            <ConditionDetection ID="Mapper" TypeID="Perf!System.Performance.DataGenericMapper">
+              <ObjectName>$Config/ObjectName$</ObjectName>
+              <CounterName>$Config/CounterName$</CounterName>
+              <InstanceName />
+              <Value>$Data/Property[@Name='ResponseTime']$</Value>
+            </ConditionDetection>
+            <ConditionDetection ID="Average" TypeID="Perf!System.Performance.AveragerCondition">
+              <NumSamples>$Config/NumSamples$</NumSamples>
+            </ConditionDetection>
+            <ConditionDetection ID="CDUnderThreshold" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Double">Value</XPathQuery>
+                  </ValueExpression>
+                  <Operator>LessEqual</Operator>
+                  <ValueExpression>
+                    <Value Type="Double">$Config/ResponseThreshold$</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+              </Expression>
+            </ConditionDetection>
+            <ConditionDetection ID="CDAboveThreshold" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <SimpleExpression>
+                  <ValueExpression>
+                    <XPathQuery Type="Double">Value</XPathQuery>
+                  </ValueExpression>
+                  <Operator>Greater</Operator>
+                  <ValueExpression>
+                    <Value Type="Double">$Config/ResponseThreshold$</Value>
+                  </ValueExpression>
+                </SimpleExpression>
+              </Expression>
+            </ConditionDetection>
+          </MemberModules>
+          <RegularDetections>
+            <RegularDetection MonitorTypeStateID="UnderThreshold">
+              <Node ID="CDUnderThreshold">
+                <Node ID="Average">
+                  <Node ID="Mapper">
+                    <Node ID="DS"></Node>
+                  </Node>
+                </Node>
+              </Node>
+            </RegularDetection>
+            <RegularDetection MonitorTypeStateID="AboveThreshold">
+              <Node ID="CDAboveThreshold">
+                <Node ID="Average">
+                  <Node ID="Mapper">
+                    <Node ID="DS"></Node>
+                  </Node>
+                </Node>
+              </Node>
+            </RegularDetection>
+          </RegularDetections>
+        </MonitorImplementation>
+      </UnitMonitorType>
+      <UnitMonitorType ID="UptimeRobot.ManagementPack.Webcheck.Status.MonitorType" Accessibility="Public">
+        <MonitorTypeStates>
+          <MonitorTypeState ID="CDStatusOK" NoDetection="false" />
+          <MonitorTypeState ID="CDStatusNOK" NoDetection="false" />
+        </MonitorTypeStates>
+        <Configuration>
+          <xsd:element name="IntervalSeconds" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="SyncTime" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="ID" type="xsd:integer" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+          <xsd:element name="APIkey" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="IntervalSeconds" Selector="$Config/IntervalSeconds$" ParameterType="int" />
+          <OverrideableParameter ID="SyncTime" Selector="$Config/SyncTime$" ParameterType="string" />
+          <OverrideableParameter ID="ID" Selector="$Config/ID$" ParameterType="int" />
+          <OverrideableParameter ID="APIkey" Selector="$Config/APIkey$" ParameterType="string" />
+        </OverrideableParameters>
+        <MonitorImplementation>
+          <MemberModules>
+            <DataSource ID="DS" TypeID="UptimeRobot.ManagementPack.Webcheck.DataSource">
+              <IntervalSeconds>$Config/IntervalSeconds$</IntervalSeconds>
+              <SyncTime>$Config/SyncTime$</SyncTime>
+              <ID>$Config/ID$</ID>
+              <APIkey>$Config/APIkey$</APIkey>
+            </DataSource>
+            <ConditionDetection ID="FilterCDStatusOK" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <And>
+                  <Expression>
+                    <SimpleExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="Integer">Property[@Name='Status']</XPathQuery>
+                      </ValueExpression>
+                      <Operator>NotEqual</Operator>
+                      <ValueExpression>
+                        <Value Type="Integer">8</Value>
+                      </ValueExpression>
+                    </SimpleExpression>
+                  </Expression>
+                  <Expression>
+                    <SimpleExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="Integer">Property[@Name='Status']</XPathQuery>
+                      </ValueExpression>
+                      <Operator>NotEqual</Operator>
+                      <ValueExpression>
+                        <Value Type="Integer">9</Value>
+                      </ValueExpression>
+                    </SimpleExpression>
+                  </Expression>
+                </And>
+              </Expression>
+            </ConditionDetection>
+            <ConditionDetection ID="FilterCDStatusNOK" TypeID="System!System.ExpressionFilter">
+              <Expression>
+                <And>
+                  <Expression>
+                    <SimpleExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="Integer">Property[@Name='Status']</XPathQuery>
+                      </ValueExpression>
+                      <Operator>Equal</Operator>
+                      <ValueExpression>
+                        <Value Type="Integer">9</Value>
+                      </ValueExpression>
+                    </SimpleExpression>
+                  </Expression>
+                  <Expression>
+                    <SimpleExpression>
+                      <ValueExpression>
+                        <XPathQuery Type="Integer">Property[@Name='Status']</XPathQuery>
+                      </ValueExpression>
+                      <Operator>Equal</Operator>
+                      <ValueExpression>
+                        <Value Type="Integer">8</Value>
+                      </ValueExpression>
+                    </SimpleExpression>
+                  </Expression>
+                </And>
+              </Expression>
+            </ConditionDetection>
+          </MemberModules>
+          <RegularDetections>
+            <RegularDetection MonitorTypeStateID="CDStatusOK">
+              <Node ID="FilterCDStatusOK">
+                <Node ID="DS" />
+              </Node>
+            </RegularDetection>
+            <RegularDetection MonitorTypeStateID="CDStatusNOK">
+              <Node ID="FilterCDStatusNOK">
+                <Node ID="DS" />
+              </Node>
+            </RegularDetection>
+          </RegularDetections>
+        </MonitorImplementation>
+      </UnitMonitorType>
+    </MonitorTypes>
+  </TypeDefinitions>
+  <Monitoring>
+    <Discoveries>
+      <Discovery ID="UptimeRobot.ManagementPack.WebChecks.Discovery" Target="UptimeRobot.WatcherNode" Enabled="true" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="UptimeRobot.WebCheck" />
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.TimedPowerShell.DiscoveryProvider" RunAs="UptimeRobot.ManagementPack.RunasProfile">
+          <IntervalSeconds>3600</IntervalSeconds>
+          <SyncTime />
+          <ScriptName>GetMonitors.ps1</ScriptName>
+          <ScriptBody><![CDATA[param($sourceId,$managedEntityId,$computerName,$APIkey)
+
+#Create Discovery Property Bag
+$api = new-object -comObject 'MOM.ScriptAPI'
+$discoveryData = $api.CreateDiscoveryData(0, $SourceId, $ManagedEntityId)
+$api.LogScriptEvent("WebChecksDiscovery.ps1", 8001, 0, "Discovery Started")
+
+$Header = @{
+    "Content-Type" = "application/x-www-form-urlencoded"
+    "Cache-Control" = "no-cache"
+    
+}
+
+$body = @{
+	"api_key" = $APIKey
+	"time_zone" = "1"
+	"format" = "json"
+}
+
+$URL = 'https://api.uptimerobot.com/v2/getMonitors'
+
+$WebMonitors = (Invoke-RestMethod -Method POST -uri $URL -Headers  $header -Body $body).Monitors
+
+#Loop through each web check.
+
+Foreach($WebMonitor in $WebMonitors)
+    {
+	#Determinate the type
+    $monitorType = $webMonitor.type
+	#Set friendly name for type
+    switch ($monitorType)
+        {
+            1 {$type = "HTTP(s)"}
+            2 {$type = "keyWord"}
+            3 {$type = "ping"}
+            4 {$type = "Port"}
+        }
+
+    #Create Class Instance
+    $instance = $discoveryData.CreateClassInstance("$MPElement[Name='UptimeRobot.WebCheck']$")
+    #Fill up properties of class
+        $instance.AddProperty("$MPElement[Name='UptimeRobot.WebCheck']/FriendlyName$", $WebMonitor.friendly_name)
+        $instance.AddProperty("$MPElement[Name='UptimeRobot.WebCheck']/URL$", $WebMonitor.url)
+		$instance.AddProperty("$MPElement[Name='UptimeRobot.WebCheck']/Type$", $type)
+			if($WebMonitor.port){$instance.AddProperty("$MPElement[Name='UptimeRobot.WebCheck']/Port$", $WebMonitor.port)}
+			if($WebMonitor.keyword_value){$instance.AddProperty("$MPElement[Name='UptimeRobot.WebCheck']/KeywordValue$", $WebMonitor.keyword_value)}
+			if($WebMonitor.keyword_type){$instance.AddProperty("$MPElement[Name='UptimeRobot.WebCheck']/KeywordType$", $WebMonitor.keyword_type)}
+			if($WebMonitor.http_userName){$instance.AddProperty("$MPElement[Name='UptimeRobot.WebCheck']/HTTPUserName$", $WebMonitor.http_username)}
+		$instance.AddProperty("$MPElement[Name='UptimeRobot.WebCheck']/ID$", $WebMonitor.id)
+     #Add the displayname, path of the server and key property of the parent class. (always recurring)
+        $instance.AddProperty("$MPElement[Name='System!System.Entity']/DisplayName$", $WebMonitor.friendly_name)
+        $instance.AddProperty("$MPElement[Name='UptimeRobot.WatcherNode']/APIkey$", $apiKey)
+        $instance.AddProperty("$MPElement[Name='Windows!Microsoft.Windows.Computer']/PrincipalName$", $computerName) 
+    #Add the instance to the discoverydate propertybag
+    
+    $discoveryData.AddInstance($instance) 
+    $api.LogScriptEvent("WebChecksDiscovery.ps1", 8003, 0, "Added instance $WebMonitor.friendly_name")   
+    }
+
+$api.LogScriptEvent("WebChecksDiscovery.ps1", 8002, 0, "Discovery Ended")
+
+$discoveryData
+
+]]></ScriptBody>
+          <Parameters>
+            <Parameter>
+              <Name>sourceID</Name>
+              <Value>$MPElement$</Value>
+            </Parameter>
+            <Parameter>
+              <Name>managedEntityID</Name>
+              <Value>$Target/Id$</Value>
+            </Parameter>
+            <Parameter>
+              <Name>computerName</Name>
+              <Value>$Target/Host/Property[Type='Windows!Microsoft.Windows.Computer']/PrincipalName$</Value>
+            </Parameter>
+            <Parameter>
+              <Name>APIkey</Name>
+              <Value>$Target/Property[Type='UptimeRobot.WatcherNode']/APIkey$</Value>
+            </Parameter>
+          </Parameters>
+          <TimeoutSeconds>600</TimeoutSeconds>
+          <StrictErrorHandling>true</StrictErrorHandling>
+        </DataSource>
+      </Discovery>
+      <Discovery ID="UptimeRobot.ManagementPack.WatcherNode.Discovery" Target="Windows!Microsoft.Windows.Computer" Enabled="true" ConfirmDelivery="false" Remotable="true" Priority="Normal">
+        <Category>Discovery</Category>
+        <DiscoveryTypes>
+          <DiscoveryClass TypeID="UptimeRobot.WatcherNode" />
+        </DiscoveryTypes>
+        <DataSource ID="DS" TypeID="Windows!Microsoft.Windows.FilteredRegistryDiscoveryProvider">
+          <ComputerName>$Target/Property[Type="Windows!Microsoft.Windows.Computer"]/NetworkName$</ComputerName>
+          <RegistryAttributeDefinitions>
+            <RegistryAttributeDefinition>
+              <AttributeName>UptimeRobotExists</AttributeName>
+              <Path>SOFTWARE\UptimeRobot</Path>
+              <PathType>0</PathType>
+              <AttributeType>0</AttributeType>
+            </RegistryAttributeDefinition>
+            <RegistryAttributeDefinition>
+              <AttributeName>APIkey</AttributeName>
+              <Path>SOFTWARE\UptimeRobot\APIkey</Path>
+              <PathType>1</PathType>
+              <AttributeType>1</AttributeType>
+            </RegistryAttributeDefinition>
+          </RegistryAttributeDefinitions>
+          <Frequency>14400</Frequency>
+          <ClassId>$MPElement[Name="UptimeRobot.WatcherNode"]$</ClassId>
+          <InstanceSettings>
+            <Settings>
+              <Setting>
+                <Name>$MPElement[Name="System!System.Entity"]/DisplayName$</Name>
+                <Value>UptimeRobot WatcherNode ($Target/Property[Type="Windows!Microsoft.Windows.Computer"]/NetbiosComputerName$)</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Name>
+                <Value>$Target/Property[Type="Windows!Microsoft.Windows.Computer"]/PrincipalName$</Value>
+              </Setting>
+              <Setting>
+                <Name>$MPElement[Name="UptimeRobot.WatcherNode"]/APIkey$</Name>
+                <Value>$Data/Values/APIkey$</Value>
+              </Setting>
+            </Settings>
+          </InstanceSettings>
+          <Expression>
+            <SimpleExpression>
+              <ValueExpression>
+                <XPathQuery Type="Boolean">Values/UptimeRobotExists</XPathQuery>
+              </ValueExpression>
+              <Operator>Equal</Operator>
+              <ValueExpression>
+                <Value Type="Boolean">true</Value>
+              </ValueExpression>
+            </SimpleExpression>
+          </Expression>
+        </DataSource>
+      </Discovery>
+    </Discoveries>
+    <Rules>
+      <Rule ID="UptimeRobot.WebCheck.ResponseTimeScript.Rule" Comment="Generic Comment" Enabled="true" Target="UptimeRobot.WebCheck" ConfirmDelivery="false" Remotable="true" Priority="Normal" DiscardLevel="100">
+        <Category>PerformanceCollection</Category>
+        <DataSources>
+          <DataSource ID="DataSource" TypeID="UptimeRobot.WebCheck.ResponseTimeScript.DS">
+            <TimeoutSeconds>200</TimeoutSeconds>
+            <IntervalSeconds>300</IntervalSeconds>
+            <apiKey>$Target/Host/Property[Type='UptimeRobot.WatcherNode']/APIkey$</apiKey>
+          </DataSource>
+        </DataSources>
+        <ConditionDetection ID="System.Performance.DataGenericMapper" TypeID="Perf!System.Performance.DataGenericMapper">
+          <ObjectName>$Target/Host/Host/Property[Type='Windows!Microsoft.Windows.Computer']/PrincipalName$</ObjectName>
+          <CounterName>Response Time (ms)</CounterName>
+          <InstanceName>$Target/Property[Type='UptimeRobot.WebCheck']/FriendlyName$</InstanceName>
+          <Value>$Data/Property[@Name='ResponseTime']$</Value>
+        </ConditionDetection>
+        <WriteActions>
+          <WriteAction ID="Microsoft.SystemCenter.CollectPerformanceData" TypeID="SC!Microsoft.SystemCenter.CollectPerformanceData" />
+          <WriteAction ID="Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" TypeID="MSDL!Microsoft.SystemCenter.DataWarehouse.PublishPerformanceData" />
+        </WriteActions>
+      </Rule>
+    </Rules>
+    <Tasks>
+      <Task ID="UptimeRobot.AddNewMonitor.Task" Accessibility="Public" Enabled="true" Target="UptimeRobot.WatcherNode" Timeout="120" Remotable="true">
+        <Category>Custom</Category>
+        <WriteAction ID="PSWA" TypeID="UptimeRobot.AddNewMonitor.Task.WA">
+          <newUrl>Http://newUrl</newUrl>
+          <name>My new URL</name>
+          <interval>300</interval>
+          <APIKey>$Target/Property[Type='UptimeRobot.WatcherNode']/APIkey$</APIKey>
+          <TimeoutSeconds>60</TimeoutSeconds>
+        </WriteAction>
+      </Task>
+    </Tasks>
+    <Monitors>
+      <UnitMonitor ID="UptimeRobot.ManagementPack.API.Status.Monitor" Accessibility="Internal" Enabled="true" Target="UptimeRobot.WatcherNode" ParentMonitorID="Health!System.Health.AvailabilityState" Remotable="true" Priority="Normal" TypeID="UptimeRobot.ManagementPack.API.Status.MonitorType" ConfirmDelivery="false" RunAs="UptimeRobot.ManagementPack.RunasProfile">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="UptimeRobot.ManagementPack.API.Status.Monitor.AlertMessage">
+          <AlertOnState>Error</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Data/Context/Property[@Name='URL']$</AlertParameter1>
+            <AlertParameter2>$Data/Context/Property[@Name='Error']$</AlertParameter2>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="CDStatusOK" MonitorTypeStateID="CDStatusOK" HealthState="Success" />
+          <OperationalState ID="CDStatusNOK" MonitorTypeStateID="CDStatusNOK" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <IntervalSeconds>300</IntervalSeconds>
+          <SyncTime>12:00</SyncTime>
+          <APIkey>$Target/Property[Type='UptimeRobot.WatcherNode']/APIkey$</APIkey>
+        </Configuration>
+      </UnitMonitor>
+      <UnitMonitor ID="UptimeRobot.ManagementPack.ResponseTime.Monitor" Accessibility="Internal" Enabled="false" Target="UptimeRobot.WebCheck" ParentMonitorID="Health!System.Health.AvailabilityState" Remotable="true" Priority="Normal" TypeID="UptimeRobot.ManagementPack.Webcheck.ResponseTime.MonitorType" ConfirmDelivery="false">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="UptimeRobot.ManagementPack.ResponseTime.Monitor.AlertMessage">
+          <AlertOnState>Error</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Property[Type='UptimeRobot.WebCheck']/FriendlyName$</AlertParameter1>
+            <AlertParameter2>$Data/Context/Value$</AlertParameter2>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="UnderThreshold" MonitorTypeStateID="UnderThreshold" HealthState="Success" />
+          <OperationalState ID="AboveThreshold" MonitorTypeStateID="AboveThreshold" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <IntervalSeconds>300</IntervalSeconds>
+          <SyncTime>12:00</SyncTime>
+          <ID>$Target/Property[Type='UptimeRobot.WebCheck']/ID$</ID>
+          <APIkey>$Target/Host/Property[Type='UptimeRobot.WatcherNode']/APIkey$</APIkey>
+          <ResponseThreshold>500</ResponseThreshold>
+          <ObjectName>$Target/Property[Type='UptimeRobot.WebCheck']/FriendlyName$</ObjectName>
+          <CounterName>Response Time (ms)</CounterName>
+          <Value>$Data/Value$</Value>
+          <NumSamples>3</NumSamples>
+        </Configuration>
+      </UnitMonitor>
+      <UnitMonitor ID="UptimeRobot.ManagementPack.Webcheck.Status.Monitor" Accessibility="Internal" Enabled="true" Target="UptimeRobot.WebCheck" ParentMonitorID="Health!System.Health.AvailabilityState" Remotable="true" Priority="Normal" TypeID="UptimeRobot.ManagementPack.Webcheck.Status.MonitorType" ConfirmDelivery="false" RunAs="UptimeRobot.ManagementPack.RunasProfile">
+        <Category>AvailabilityHealth</Category>
+        <AlertSettings AlertMessage="UptimeRobot.ManagementPack.Webcheck.Status.Monitor.AlertMessage">
+          <AlertOnState>Error</AlertOnState>
+          <AutoResolve>true</AutoResolve>
+          <AlertPriority>Normal</AlertPriority>
+          <AlertSeverity>MatchMonitorHealth</AlertSeverity>
+          <AlertParameters>
+            <AlertParameter1>$Target/Property[Type='UptimeRobot.WebCheck']/FriendlyName$</AlertParameter1>
+            <AlertParameter2>$Data/Context/Property[@Name='Status']$</AlertParameter2>
+          </AlertParameters>
+        </AlertSettings>
+        <OperationalStates>
+          <OperationalState ID="CDStatusOK" MonitorTypeStateID="CDStatusOK" HealthState="Success" />
+          <OperationalState ID="CDStatusNOK" MonitorTypeStateID="CDStatusNOK" HealthState="Error" />
+        </OperationalStates>
+        <Configuration>
+          <IntervalSeconds>300</IntervalSeconds>
+          <SyncTime>12:00</SyncTime>
+          <ID>$Target/Property[Type='UptimeRobot.WebCheck']/ID$</ID>
+          <APIkey>$Target/Host/Property[Type='UptimeRobot.WatcherNode']/APIkey$</APIkey>
+        </Configuration>
+      </UnitMonitor>
+      <DependencyMonitor ID="UptimeRobot.ManagementPack.Webchecks.Dependency.Monitor" Accessibility="Internal" Enabled="true" Target="UptimeRobot.WatcherNode" ParentMonitorID="Health!System.Health.AvailabilityState" Remotable="true" Priority="Normal" RelationshipType="UptimeRobotNodeHostsChecks" MemberMonitor="Health!System.Health.AvailabilityState">
+        <Category>AvailabilityHealth</Category>
+        <Algorithm>WorstOf</Algorithm>
+      </DependencyMonitor>
+    </Monitors>
+  </Monitoring>
+  <Presentation>
+    <Views>
+      <View ID="UptimeRobot.ManagementPack.WebChecks.StateView" Accessibility="Internal" Target="UptimeRobot.WebCheck" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria />
+        <Presentation>
+          <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>State</Name>
+            <Id>UptimeRobot.WebCheck</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="1" SortIndex="-1" Width="22" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Maintenance Mode</Name>
+            <Id>InMaintenanceMode</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Name</Name>
+            <Id>Name</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Path</Name>
+            <Id>Path</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="4" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Display Name</Name>
+            <Id>DisplayName</Id>
+          </ColumnInfo>
+        </Presentation>
+      </View>
+      <View ID="UptimeRobot.ManagementPack.WatcherNode.Stateview" Accessibility="Internal" Target="UptimeRobot.WatcherNode" TypeID="SC!Microsoft.SystemCenter.StateViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria />
+        <Presentation>
+          <ColumnInfo Index="0" SortIndex="0" Width="100" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>State</Name>
+            <Id>UptimeRobot.WatcherNode</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="1" SortIndex="-1" Width="22" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Maintenance Mode</Name>
+            <Id>InMaintenanceMode</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Name</Name>
+            <Id>Name</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Path</Name>
+            <Id>Path</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="4" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Display Name</Name>
+            <Id>DisplayName</Id>
+          </ColumnInfo>
+        </Presentation>
+      </View>
+      <View ID="UptimeRobot.ManagementPack.WebChecks.AlertView" Accessibility="Internal" Target="UptimeRobot.WebCheck" TypeID="SC!Microsoft.SystemCenter.AlertViewType" Visible="true">
+        <Category>Operations</Category>
+        <Criteria>
+          <ResolutionState>
+            <StateRange Operator="NotEquals">255</StateRange>
+          </ResolutionState>
+        </Criteria>
+        <Presentation>
+          <ColumnInfo Index="0" SortIndex="0" Width="60" Grouped="true" Sorted="false" IsSortable="true" Visible="true" SortOrder="Descending">
+            <Name>Severity</Name>
+            <Id>Severity</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="1" SortIndex="-1" Width="28" Grouped="false" Sorted="false" IsSortable="false" Visible="true" SortOrder="Ascending">
+            <Name>Icon</Name>
+            <Id>Icon</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="2" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Path</Name>
+            <Id>MonitoringObjectPath</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="3" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Source</Name>
+            <Id>MonitoringObjectDisplayName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="4" SortIndex="-1" Width="22" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Maintenance Mode</Name>
+            <Id>MonitoringObjectInMaintenanceMode</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="5" SortIndex="-1" Width="250" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Name</Name>
+            <Id>Name</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="6" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="true" SortOrder="Ascending">
+            <Name>Resolution State</Name>
+            <Id>ResolutionState</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="7" SortIndex="1" Width="150" Grouped="false" Sorted="true" IsSortable="true" Visible="true" SortOrder="Descending">
+            <Name>Created</Name>
+            <Id>TimeRaised</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="8" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="false" Visible="true" SortOrder="Ascending">
+            <Name>Age</Name>
+            <Id>Age</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="9" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Type</Name>
+            <Id>Category</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="10" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Owner</Name>
+            <Id>Owner</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="11" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Priority</Name>
+            <Id>Priority</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="12" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Latency</Name>
+            <Id>Latency</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="13" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Description</Name>
+            <Id>Description</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="14" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Connector</Name>
+            <Id>ConnectorId</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="15" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Forwarding Status</Name>
+            <Id>ConnectorStatus</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="16" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Class</Name>
+            <Id>Class</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="17" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Time in State</Name>
+            <Id>TimeInState</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="18" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Custom Field 1</Name>
+            <Id>CustomField1</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="19" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Custom Field 2</Name>
+            <Id>CustomField2</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="20" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Custom Field 3</Name>
+            <Id>CustomField3</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="21" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Custom Field 4</Name>
+            <Id>CustomField4</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="22" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Custom Field 5</Name>
+            <Id>CustomField5</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="23" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Custom Field 6</Name>
+            <Id>CustomField6</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="24" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Custom Field 7</Name>
+            <Id>CustomField7</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="25" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Custom Field 8</Name>
+            <Id>CustomField8</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="26" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Custom Field 9</Name>
+            <Id>CustomField9</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="27" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Custom Field 10</Name>
+            <Id>CustomField10</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="28" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Resolved By</Name>
+            <Id>ResolvedBy</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="29" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Time Resolved</Name>
+            <Id>TimeResolved</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="30" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Last State Change</Name>
+            <Id>TimeResolutionStateLastModified</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="31" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Last Modified</Name>
+            <Id>LastModified</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="32" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Last Modified By</Name>
+            <Id>LastModifiedBy</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="33" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Management Group</Name>
+            <Id>ManagementGroup</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="34" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Site</Name>
+            <Id>SiteName</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="35" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Repeat Count</Name>
+            <Id>RepeatCount</Id>
+          </ColumnInfo>
+          <ColumnInfo Index="36" SortIndex="-1" Width="100" Grouped="false" Sorted="false" IsSortable="true" Visible="false" SortOrder="Ascending">
+            <Name>Ticket ID</Name>
+            <Id>TicketId</Id>
+          </ColumnInfo>
+        </Presentation>
+        <Target>$MPElement[Name="UptimeRobot.WebCheck"]$</Target>
+      </View>
+    </Views>
+    <Folders>
+      <Folder ID="UptimeRobot.ManagementPack.Folders" Accessibility="Internal" ParentFolder="SC!Microsoft.SystemCenter.Monitoring.ViewFolder.Root" />
+    </Folders>
+    <FolderItems>
+      <FolderItem ElementID="UptimeRobot.ManagementPack.WebChecks.StateView" Folder="UptimeRobot.ManagementPack.Folders" ID="UptimeRobot.ManagementPack.WebChecks.StateView.FolderItem" />
+      <FolderItem ElementID="UptimeRobot.ManagementPack.WatcherNode.Stateview" Folder="UptimeRobot.ManagementPack.Folders" ID="UptimeRobot.ManagementPack.WatcherNode.Stateview.FolderItem" />
+      <FolderItem ElementID="UptimeRobot.ManagementPack.WebChecks.AlertView" Folder="UptimeRobot.ManagementPack.Folders" ID="UptimeRobot.ManagementPack.WebChecks.AlertView.FolderItem" />
+    </FolderItems>
+    <StringResources>
+      <StringResource ID="UptimeRobot.ManagementPack.API.Status.Monitor.AlertMessage" />
+      <StringResource ID="UptimeRobot.ManagementPack.ResponseTime.Monitor.AlertMessage" />
+      <StringResource ID="UptimeRobot.ManagementPack.Webcheck.Status.Monitor.AlertMessage" />
+    </StringResources>
+  </Presentation>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.WebChecks.Discovery">
+          <Name>Uptime Robot Web Checks Discovery</Name>
+          <Description>Discovers Web checks of Uptime Robot through the use of the API (JSON)</Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.WatcherNode.Discovery">
+          <Name>Uptime Robot Watchernode Discovery</Name>
+          <Description>Checks for existing registry value Uptime robot HKLM\SOFTWARE\Uptimerobot</Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.API.Status.Monitor">
+          <Name>API Status Monitor</Name>
+          <Description>Evaluates the status of API by queryign the monitors. </Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.API.Status.Monitor.AlertMessage">
+          <Name>Uptime Robot Webcheck Status Alert</Name>
+          <Description>The Uptime Robot API (URL: {0}) does not seem available. 
+The error was:
+{1}
+
+This can be due to the following reasons:
+- Proxy issues. Make sure the username and password of the UptimeRobot Runas Profile is configured.
+- The API is down effectively. Please check with UptimeRobot
+</Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.API.Status.Monitor" SubElementID="CDStatusOK">
+          <Name>CDStatusOK</Name>
+          <Description>CDStatusOK</Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.API.Status.Monitor" SubElementID="CDStatusNOK">
+          <Name>CDStatusNOK</Name>
+          <Description>CDStatusNOK</Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.Webchecks.Dependency.Monitor">
+          <Name>Uptime Robot Webchecks Dependency Monitor</Name>
+          <Description>Dependency monitor for Uptime Robot webchecks</Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.ResponseTime.Monitor">
+          <Name>Webcheck Response Time Monitor</Name>
+          <Description>Monitors the response time of the website, when it exceeds the threshold, an alert will be triggered.</Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.ResponseTime.Monitor.AlertMessage">
+          <Name>Uptime Robot Webcheck Response Time Alert</Name>
+          <Description>An external facing website {0} is responding slowly, the average responsetime is {1}
+
+</Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.ResponseTime.Monitor" SubElementID="UnderThreshold">
+          <Name>UnderThreshold</Name>
+          <Description>UnderThreshold</Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.ResponseTime.Monitor" SubElementID="AboveThreshold">
+          <Name>AboveThreshold</Name>
+          <Description>AboveThreshold</Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.Webcheck.Status.Monitor">
+          <Name>Webcheck Status Monitor</Name>
+          <Description>Evaluate status of a specific webcheck</Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.Webcheck.Status.Monitor.AlertMessage">
+          <Name>Uptime Robot Webcheck Status Alert</Name>
+          <Description>An external facing website {0} is down, the status of the website is {1}
+These are the possible states:
+0 - paused 
+1 - not checked yet 
+2 - up 
+8 - seems down 
+9 - down 
+</Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.Webcheck.Status.Monitor" SubElementID="CDStatusOK">
+          <Name>CDStatusOK</Name>
+          <Description>CDStatusOK</Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.Webcheck.Status.Monitor" SubElementID="CDStatusNOK">
+          <Name>CDStatusNOK</Name>
+          <Description>CDStatusNOK</Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck.ResponseTimeScript.Rule">
+          <Name>Uptime Robot Web Check Response time</Name>
+          <Description></Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.AddNewMonitor.Task">
+          <Name>Add new WebCheck monitor</Name>
+          <Description>Will add a new HTTP monitor to your Uptime Robot account</Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.Folders">
+          <Name>Uptime Robot</Name>
+          <Description></Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.WebChecks.StateView">
+          <Name>Web Checks State View</Name>
+          <Description>Web Checks State View</Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.WatcherNode.Stateview">
+          <Name>Watcher Node State View</Name>
+          <Description>Watcher Node State View</Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.WebChecks.AlertView">
+          <Name>Web Checks Alert View</Name>
+          <Description>Web Checks Alert View</Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack">
+          <Name>Uptime Robot Management Pack</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WatcherNode">
+          <Name>Uptime Robot Watcher Node</Name>
+          <Description></Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck">
+          <Name>Uptime Robot Web Check</Name>
+          <Description></Description>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WatcherNode" SubElementID="APIkey">
+          <Name>API Key</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck" SubElementID="ID">
+          <Name>ID</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck" SubElementID="FriendlyName">
+          <Name>Friendly Name</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck" SubElementID="URL">
+          <Name>URL</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck" SubElementID="Interval">
+          <Name>Interval of the Check</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck" SubElementID="KeywordValue">
+          <Name>Keyword Value</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck" SubElementID="KeywordType">
+          <Name>Keyword Type</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck" SubElementID="HTTPUserName">
+          <Name>HTTP User Name</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck" SubElementID="Port">
+          <Name>Port</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.WebCheck" SubElementID="Type">
+          <Name>Type</Name>
+        </DisplayString>
+        <DisplayString ElementID="UptimeRobot.ManagementPack.RunasProfile">
+          <Name>Uptime Robot Runas Profile</Name>
+          <Description>Used to monitor the API of the Uptime Robot, requires internet access</Description>
+        </DisplayString>
+      </DisplayStrings>
+      <KnowledgeArticles></KnowledgeArticles>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPack>
